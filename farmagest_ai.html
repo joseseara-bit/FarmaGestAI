@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FarmaGest AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --lime:#A8D84E;--lime-dark:#88B832;--lime-pale:#F2FAE2;--lime-mid:#DCEFB0;
+  --purple:#C4AAFF;--purple-dark:#A78BFA;
+  --white:#FFFFFF;--ink:#1C2B0A;--ink-mid:#3A4D22;--ink-soft:#6B7C56;
+  --border:#D8ECBA;--border-soft:#EEF5E4;--cream:#F7FAF0;
+  --font-serif:'Newsreader',Georgia,serif;--font-sans:'Outfit',sans-serif;
+  --radius:10px;--radius-lg:20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-sans);color:var(--ink);background:var(--white);line-height:1.6;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--font-sans)}
+.page{display:none;animation:fadeUp .4s ease forwards}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:1160px;margin:0 auto;padding:0 32px}
+.container--narrow{max-width:800px;margin:0 auto;padding:0 32px}
+.section{padding:88px 0}
+.section--cream{background:var(--cream)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime-dark);background:var(--lime-pale);padding:5px 14px;border-radius:100px;border:1px solid var(--lime-mid)}
+.tag--on-lime{color:var(--ink);background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.4)}
+.section-header{text-align:center;margin-bottom:60px}
+.section-header .tag{margin-bottom:16px}
+.section-header h2{font-family:var(--font-serif);font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:300;line-height:1.18;color:var(--ink);margin-bottom:14px}
+.section-header p{font-size:16px;color:var(--ink-soft);max-width:540px;margin:0 auto;font-weight:300}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:100px;font-size:15px;font-weight:700;transition:all .22s ease;font-family:var(--font-sans);cursor:pointer;border:none;white-space:nowrap}
+.btn--purple{background:var(--purple);color:var(--ink)}
+.btn--purple:hover{background:var(--purple-dark);color:var(--white);transform:translateY(-2px);box-shadow:0 6px 22px rgba(167,139,250,.4)}
+.btn--white-filled{background:var(--white);color:var(--ink)}
+.btn--white-filled:hover{background:var(--lime-pale);transform:translateY(-2px)}
+.btn--lime{background:var(--lime);color:var(--white)}
+.btn--lime:hover{background:var(--lime-dark);transform:translateY(-2px);box-shadow:0 6px 22px rgba(130,201,30,.35)}
+.btn--outline{background:transparent;color:var(--ink);border:2px solid var(--border)}
+.btn--outline:hover{border-color:var(--lime);color:var(--lime-dark);transform:translateY(-2px)}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:999;padding:18px 0;transition:all .3s ease}
+.nav.scrolled{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);box-shadow:0 1px 24px rgba(28,43,10,.1);padding:13px 0}
+.nav__inner{display:flex;align-items:center;justify-content:space-between}
+.nav__logo{cursor:pointer;font-family:var(--font-serif);font-size:22px;font-weight:400;color:var(--white);transition:color .2s}
+.nav__logo span{font-style:italic}
+.nav.scrolled .nav__logo{color:var(--ink)}
+.nav__links{display:flex;align-items:center;gap:6px;list-style:none}
+.nav__links li button{font-size:14px;font-weight:500;color:rgba(255,255,255,.85);padding:8px 16px;border-radius:100px;transition:all .2s;background:none;border:none;cursor:pointer;font-family:var(--font-sans)}
+.nav.scrolled .nav__links li button{color:var(--ink-soft)}
+.nav__links li button:hover,.nav__links li button.active{color:var(--ink);background:var(--white)}
+.nav.scrolled .nav__links li button:hover,.nav.scrolled .nav__links li button.active{color:var(--ink);background:var(--lime-pale)}
+.nav__cta-btn{background:var(--purple)!important;color:var(--ink)!important;border-radius:100px!important;font-weight:700!important}
+.nav__cta-btn:hover{background:var(--purple-dark)!important;color:var(--white)!important}
+.nav.scrolled .nav__cta-btn{background:var(--lime)!important;color:var(--white)!important}
+.nav.scrolled .nav__cta-btn:hover{background:var(--lime-dark)!important}
+.lang-toggle{display:flex;align-items:center;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);border-radius:100px;padding:3px;gap:2px}
+.nav.scrolled .lang-toggle{background:rgba(0,0,0,.06);border-color:var(--border)}
+.lang-btn{font-size:12px;font-weight:700;color:rgba(255,255,255,.55);padding:4px 11px;border-radius:100px;transition:all .2s;border:none;cursor:pointer;font-family:var(--font-sans);background:none;letter-spacing:.04em}
+.nav.scrolled .lang-btn{color:var(--ink-soft)}
+.lang-btn.active{background:white;color:var(--ink)}
+.nav.scrolled .lang-btn.active{background:var(--lime);color:white}
+/* HERO */
+.hero{min-height:100vh;background:var(--lime);position:relative;display:flex;align-items:center;overflow:hidden;padding-top:80px}
+.hero__bg{position:absolute;inset:0;pointer-events:none}
+.hero__bg-circle{position:absolute;border-radius:50%;filter:blur(90px)}
+.hero__bg-circle--1{width:600px;height:600px;background:rgba(255,255,255,.15);top:-200px;right:-100px}
+.hero__bg-circle--2{width:400px;height:400px;background:rgba(100,170,10,.4);bottom:-80px;left:-60px}
+.hero__inner{position:relative;z-index:2;width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;gap:48px;padding:80px 0 96px}
+.hero__content{max-width:760px;width:100%}
+.hero__eyebrow{display:flex;align-items:center;justify-content:center;margin-bottom:26px}
+.hero h1{font-family:var(--font-serif);font-size:clamp(2.4rem,5vw,4rem);font-weight:300;color:var(--white);line-height:1.13;margin-bottom:22px}
+.hero h1 em{font-style:italic;color:var(--ink)}
+.hero__sub{font-size:18px;color:rgba(255,255,255,.85);font-weight:300;max-width:520px;margin:0 auto 40px;line-height:1.7}
+.hero__actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:52px}
+.hero__stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,.25);padding-top:30px;max-width:560px;width:100%}
+.hero__stat{text-align:center;padding:0 14px;border-right:1px solid rgba(255,255,255,.2)}
+.hero__stat:last-child{border-right:none}
+.hero__stat-num{font-family:var(--font-serif);font-size:2.1rem;font-weight:300;color:var(--white);line-height:1;margin-bottom:4px}
+.hero__stat-num span{color:var(--ink)}
+.hero__stat-label{font-size:11px;color:rgba(255,255,255,.6);letter-spacing:.04em}
+/* CHATBOT */
+.hero__chat-wrapper{width:100%;max-width:660px;position:relative}
+.chat-card{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:28px;backdrop-filter:blur(20px);position:relative;overflow:hidden}
+.chat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent)}
+.chat-card__header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.15)}
+.chat-card__avatar{width:42px;height:42px;background:var(--white);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;color:var(--lime-dark);font-weight:800}
+.chat-card__info h3{font-size:15px;font-weight:600;color:var(--white);margin-bottom:2px}
+.chat-card__info p{font-size:12px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:5px}
+.chat-card__info p::before{content:'';width:6px;height:6px;background:#4ade80;border-radius:50%;display:inline-block}
+.chat-messages{min-height:200px;max-height:260px;overflow-y:auto;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
+.chat-messages::-webkit-scrollbar{width:3px}
+.chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+.chat-bubble{display:flex;gap:10px;align-items:flex-start;animation:fadeUp .3s ease forwards}
+.chat-bubble--user{flex-direction:row-reverse}
+.chat-bubble__icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;background:rgba(255,255,255,.2);color:var(--ink)}
+.chat-bubble--user .chat-bubble__icon{background:rgba(255,255,255,.15);color:var(--white)}
+.chat-bubble__msg{max-width:78%;padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.55;text-align:left}
+.chat-bubble--ai .chat-bubble__msg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:var(--white);border-top-left-radius:4px}
+.chat-bubble--user .chat-bubble__msg{background:rgba(255,255,255,.1);color:rgba(255,255,255,.9);border-top-right-radius:4px}
+.chat-bubble__link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:var(--purple);color:var(--ink);padding:6px 14px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-sans);transition:all .2s}
+.chat-bubble__link:hover{background:var(--purple-dark);color:var(--white);transform:translateX(3px)}
+.chat-typing{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.5);margin-bottom:10px}
+.chat-typing__dots{display:flex;gap:4px}
+.chat-typing__dots span{width:5px;height:5px;background:rgba(255,255,255,.6);border-radius:50%;animation:typingDot 1.2s infinite;display:block}
+.chat-typing__dots span:nth-child(2){animation-delay:.2s}
+.chat-typing__dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+.chat-input-area{display:flex;gap:10px;align-items:center}
+.chat-input-area input{flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;color:white;font-family:var(--font-sans);font-size:14px;outline:none;transition:border-color .2s}
+.chat-input-area input::placeholder{color:rgba(255,255,255,.4)}
+.chat-input-area input:focus{border-color:rgba(255,255,255,.6)}
+.chat-send-btn{width:42px;height:42px;background:var(--purple);border:none;border-radius:12px;color:var(--white);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
+.chat-send-btn:hover{background:var(--purple-dark);transform:scale(1.06)}
+.chat-send-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.feature-card{background:var(--white);border:1.5px solid var(--border-soft);border-radius:var(--radius-lg);padding:32px 28px;transition:all .28s ease;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--lime);transform:scaleX(0);transform-origin:left;transition:transform .28s ease}
+.feature-card:hover{box-shadow:0 10px 40px rgba(130,201,30,.15);transform:translateY(-4px);border-color:var(--lime)}
+.feature-card:hover::before{transform:scaleX(1)}
+.feature-card__num{font-family:var(--font-serif);font-size:2rem;font-weight:300;color:var(--lime-dark);line-height:1;margin-bottom:14px}
+.feature-card h3{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.feature-card p{font-size:14px;color:var(--ink-soft);font-weight:300;line-height:1.65}
+/* STEPS */
+.steps-list{display:flex;flex-direction:column}
+.step-item{display:grid;grid-template-columns:60px 1fr;gap:26px;padding:32px 0;border-bottom:1px solid var(--border-soft)}
+.step-item:last-child{border-bottom:none}
+.step-item__number{width:60px;height:60px;border-radius:50%;background:var(--lime-pale);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:1.5rem;font-weight:300;color:var(--lime-dark);flex-shrink:0;border:1.5px solid var(--lime-mid);transition:all .3s}
+.step-item:hover .step-item__number{background:var(--lime);color:white;border-color:var(--lime)}
+.step-item h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.step-item p{font-size:14px;color:var(--ink-soft);font-weight:300;line-height:1.65}
+/* TESTIMONIALS */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.testimonial-card{background:var(--white);border:1.5px solid var(--border-soft);border-radius:var(--radius-lg);padding:30px;transition:all .28s}
+.testimonial-card:hover{box-shadow:0 8px 32px rgba(130,201,30,.12);transform:translateY(-3px);border-color:var(--lime)}
+.testimonial-card__quote{font-family:var(--font-serif);font-style:italic;font-size:16px;color:var(--ink-mid);line-height:1.65;margin-bottom:22px}
+.testimonial-card__quote::before{content:'\201C';font-size:2.8rem;color:var(--lime);line-height:0;vertical-align:-.65em;margin-right:3px}
+.testimonial-card__author{display:flex;align-items:center;gap:12px}
+.testimonial-card__avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--lime) 0%,var(--lime-dark) 100%);display:flex;align-items:center;justify-content:center;font-size:13px;color:white;font-weight:700}
+.testimonial-card__meta strong{display:block;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.testimonial-card__meta span{font-size:12px;color:var(--ink-soft)}
+/* CTA */
+.cta-section{background:var(--lime);padding:88px 0;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(255,255,255,.08);top:-200px;right:-100px;pointer-events:none}
+.cta-section h2{font-family:var(--font-serif);font-size:clamp(1.9rem,4vw,3rem);font-weight:300;color:white;margin-bottom:14px;line-height:1.2;position:relative}
+.cta-section p{font-size:16px;color:rgba(255,255,255,.8);max-width:460px;margin:0 auto 36px;font-weight:300;position:relative}
+/* PAGE HERO */
+.page-hero{background:var(--lime);padding:160px 0 88px;position:relative;overflow:hidden;text-align:center}
+.page-hero--left{text-align:left}
+.page-hero::before{content:'';position:absolute;width:700px;height:400px;background:rgba(255,255,255,.1);border-radius:50%;filter:blur(60px);top:-100px;right:-150px;pointer-events:none}
+.page-hero .tag{background:rgba(255,255,255,.25);color:var(--ink);border-color:rgba(255,255,255,.4);margin-bottom:18px;display:inline-block;position:relative}
+.page-hero h1{font-family:var(--font-serif);font-size:clamp(2.4rem,5vw,3.8rem);font-weight:300;color:white;margin-bottom:16px;position:relative;line-height:1.15}
+.page-hero h1 em{font-style:italic;color:var(--ink)}
+.page-hero p{font-size:17px;color:rgba(255,255,255,.8);font-weight:300;max-width:520px;margin:0 auto;position:relative}
+.page-hero--left p{margin:0}
+/* HOW IT WORKS */
+.features-deep{padding:88px 0}
+.feature-deep-item{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;margin-bottom:88px;padding-bottom:88px;border-bottom:1.5px solid var(--border-soft)}
+.feature-deep-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.feature-deep-item:nth-child(even){direction:rtl}
+.feature-deep-item:nth-child(even)>*{direction:ltr}
+.feature-deep-item__text .tag{margin-bottom:14px}
+.feature-deep-item__text h2{font-family:var(--font-serif);font-size:clamp(1.7rem,2.8vw,2.3rem);font-weight:300;color:var(--ink);line-height:1.2;margin-bottom:14px}
+.feature-deep-item__text p{font-size:15px;color:var(--ink-soft);font-weight:300;line-height:1.75;margin-bottom:22px}
+.feature-deep-item__list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.feature-deep-item__list li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink-soft)}
+.feature-deep-item__list li::before{content:'✓';width:20px;height:20px;background:var(--lime-pale);color:var(--lime-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;border:1px solid var(--lime-mid)}
+.feature-deep-item__visual{background:linear-gradient(135deg,var(--lime-pale) 0%,var(--cream) 100%);border-radius:20px;aspect-ratio:4/3;border:1.5px solid var(--border);overflow:hidden}
+.feature-visual-inner{width:100%;height:100%;padding:24px;display:flex;flex-direction:column;gap:12px}
+.mini-card{background:white;border:1px solid var(--border-soft);border-radius:10px;padding:12px 16px;box-shadow:0 2px 10px rgba(28,43,10,.05)}
+.mini-card__label{font-size:10px;font-weight:700;color:var(--ink-soft);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.mini-card__value{font-size:20px;font-weight:800;color:var(--ink);line-height:1}
+.mini-card__sub{font-size:11px;color:var(--lime-dark);margin-top:3px;font-weight:600}
+.mini-bar-row{display:flex;align-items:center;gap:8px;margin:3px 0}
+.mini-bar-label{font-size:10px;color:var(--ink-soft);width:76px;flex-shrink:0}
+.mini-bar-track{flex:1;height:5px;background:var(--border-soft);border-radius:100px;overflow:hidden}
+.mini-bar-fill{height:100%;background:linear-gradient(90deg,var(--lime-dark),var(--lime));border-radius:100px}
+.mini-bar-pct{font-size:10px;font-weight:700;color:var(--ink);width:28px;text-align:right}
+.mini-alert{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;font-size:11px;font-weight:600}
+.mini-alert--warn{background:#FFF8E8;border:1px solid #F0C060;color:#7A5800}
+.mini-alert--ok{background:var(--lime-pale);border:1px solid var(--lime-mid);color:var(--lime-dark)}
+.mini-chart-row{display:flex;align-items:flex-end;gap:5px;height:46px;padding:0 2px}
+.mini-bar-chart{flex:1;background:var(--lime-mid);border-radius:4px 4px 0 0;transition:background .3s}
+.mini-bar-chart:hover{background:var(--lime)}
+.mini-tag-row{display:flex;gap:6px;flex-wrap:wrap}
+.mini-tag{background:var(--lime-pale);color:var(--lime-dark);padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;border:1px solid var(--lime-mid)}
+.mini-patient-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border-soft)}
+.mini-patient-row:last-child{border-bottom:none}
+.mini-patient-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--lime-dark));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:800}
+.mini-patient-info{flex:1}
+.mini-patient-name{font-size:11px;font-weight:700;color:var(--ink);line-height:1}
+.mini-patient-med{font-size:9px;color:var(--ink-soft);margin-top:2px}
+.mini-patient-badge{font-size:9px;padding:2px 7px;border-radius:100px;font-weight:700}
+.mini-patient-badge--ok{background:var(--lime-pale);color:var(--lime-dark)}
+.mini-patient-badge--warn{background:#FFF3CD;color:#856404}
+/* PLANS */
+.plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:860px;margin:0 auto;padding:72px 0}
+.plan-card{background:var(--white);border:2px solid var(--border-soft);border-radius:var(--radius-lg);padding:44px 40px;position:relative;transition:all .28s}
+.plan-card:hover{box-shadow:0 16px 48px rgba(130,201,30,.18);transform:translateY(-5px)}
+.plan-card--featured{border-color:var(--lime);box-shadow:0 8px 32px rgba(130,201,30,.2)}
+.plan-card__badge{position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:var(--lime);color:white;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 18px;border-radius:100px;white-space:nowrap}
+.plan-card__name{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--lime-dark);margin-bottom:10px}
+.plan-card h3{font-family:var(--font-serif);font-size:1.7rem;font-weight:300;color:var(--ink);margin-bottom:12px;line-height:1.25}
+.plan-card__tagline{font-size:14px;color:var(--ink-soft);margin-bottom:30px;font-weight:300;line-height:1.6;padding-bottom:26px;border-bottom:1.5px solid var(--border-soft)}
+.plan-price{margin-bottom:28px}
+.plan-price__amount{font-family:var(--font-serif);font-size:3.8rem;font-weight:300;color:var(--ink);line-height:1}
+.plan-price__amount sup{font-size:1.3rem;vertical-align:super;color:var(--ink-soft)}
+.plan-price__period{font-size:13px;color:var(--ink-soft);margin-top:4px}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:34px}
+.plan-features li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink-mid)}
+.plan-features li::before{content:'✓';width:19px;height:19px;background:var(--lime-pale);color:var(--lime-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:2px;border:1px solid var(--lime-mid)}
+.plan-card .btn{width:100%;justify-content:center;font-size:15px}
+.plans-comparison{padding:80px 0;background:var(--cream)}
+/* ABOUT */
+.about-hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative}
+.about-card{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:32px;backdrop-filter:blur(10px)}
+.about-mission{padding:88px 0}
+.about-mission__grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start}
+.about-mission h2{font-family:var(--font-serif);font-size:clamp(1.7rem,2.8vw,2.3rem);font-weight:300;color:var(--ink);margin-bottom:14px;line-height:1.2}
+.about-mission p{font-size:15px;color:var(--ink-soft);font-weight:300;line-height:1.75;margin-bottom:14px}
+.about-values{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.value-card{background:var(--cream);border:1.5px solid var(--border-soft);border-radius:var(--radius);padding:22px}
+.value-card__dot{width:10px;height:10px;border-radius:50%;background:var(--lime);margin-bottom:12px}
+.value-card h4{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.value-card p{font-size:13px;color:var(--ink-soft);font-weight:300;line-height:1.55}
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:72px;align-items:start}
+.contact-info h2{font-family:var(--font-serif);font-size:1.7rem;font-weight:300;color:var(--ink);margin-bottom:14px}
+.contact-info p{font-size:15px;color:var(--ink-soft);font-weight:300;line-height:1.7;margin-bottom:32px}
+.contact-details{display:flex;flex-direction:column;gap:16px}
+.contact-detail{display:flex;align-items:flex-start;gap:13px}
+.contact-detail__icon{width:40px;height:40px;background:var(--lime-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--lime-mid);color:var(--lime-dark)}
+.contact-detail strong{display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em}
+.contact-detail span{font-size:14px;color:var(--ink-soft)}
+.contact-form{background:white;border:1.5px solid var(--border-soft);border-radius:var(--radius-lg);padding:44px;box-shadow:0 4px 32px rgba(28,43,10,.06)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--font-sans);font-size:14px;color:var(--ink);background:var(--white);transition:border-color .2s,box-shadow .2s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--lime);box-shadow:0 0 0 3px rgba(130,201,30,.12)}
+.form-group textarea{resize:vertical;min-height:120px}
+.form-submit{width:100%;justify-content:center;font-size:16px;padding:15px}
+.form-success{display:none;text-align:center;padding:32px}
+.form-success__icon{font-size:44px;margin-bottom:14px;color:var(--lime-dark)}
+.form-success h3{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.form-success p{color:var(--ink-soft);font-size:15px;font-weight:300}
+/* LEGAL */
+.legal-content{padding:40px 0 88px}
+.legal-content h2{font-family:var(--font-serif);font-size:1.6rem;font-weight:300;color:var(--ink);margin:36px 0 12px}
+.legal-content h3{font-size:15px;font-weight:700;color:var(--ink);margin:22px 0 8px}
+.legal-content p{font-size:15px;color:var(--ink-soft);line-height:1.75;margin-bottom:14px;font-weight:300}
+.legal-content ul{margin:0 0 14px 20px;display:flex;flex-direction:column;gap:6px}
+.legal-content ul li{font-size:15px;color:var(--ink-soft);line-height:1.65;font-weight:300}
+.legal-content strong{color:var(--ink);font-weight:600}
+.legal-date{font-size:13px;color:var(--ink-soft);font-weight:300;margin-bottom:36px;padding-bottom:24px;border-bottom:1.5px solid var(--border-soft)}
+.legal-lang-note{background:var(--lime-pale);border:1.5px solid var(--lime-mid);border-radius:10px;padding:14px 20px;margin-bottom:28px;font-size:14px;color:var(--ink-mid);display:none}
+.legal-lang-note strong{font-weight:700}
+/* FOOTER */
+.footer{background:var(--ink);padding:64px 0 28px}
+.footer__top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:52px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:28px}
+.footer__logo{font-family:var(--font-serif);font-size:20px;font-weight:400;color:white;margin-bottom:14px;cursor:pointer;display:inline-block}
+.footer__logo span{font-style:italic;color:var(--lime)}
+.footer__tagline{font-size:13px;color:rgba(255,255,255,.4);font-weight:300;line-height:1.7;max-width:220px}
+.footer__col h4{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:16px}
+.footer__links{list-style:none;display:flex;flex-direction:column;gap:9px}
+.footer__links li button,.footer__links li a{font-size:14px;color:rgba(255,255,255,.55);font-family:var(--font-sans);background:none;border:none;cursor:pointer;transition:color .2s;text-align:left;padding:0}
+.footer__links li button:hover,.footer__links li a:hover{color:var(--lime)}
+.footer__bottom{display:flex;align-items:center;justify-content:space-between}
+.footer__copy{font-size:12px;color:rgba(255,255,255,.28)}
+.footer__legal{display:flex;gap:18px}
+.footer__legal a{font-size:12px;color:rgba(255,255,255,.28);transition:color .2s;cursor:pointer}
+.footer__legal a:hover{color:rgba(255,255,255,.6)}
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:white;padding:13px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 6px 24px rgba(0,0,0,.2);border-left:3px solid var(--lime);z-index:9999;transform:translateY(70px);opacity:0;transition:all .3s ease}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:900px){
+  .hero__inner{gap:36px;padding:60px 0}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .testimonials-grid{grid-template-columns:1fr}
+  .plans-grid{grid-template-columns:1fr}
+  .feature-deep-item{grid-template-columns:1fr;gap:36px}
+  .feature-deep-item:nth-child(even){direction:ltr}
+  .about-hero-inner{grid-template-columns:1fr}
+  .about-mission__grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .footer__top{grid-template-columns:1fr 1fr}
+  .nav__links{display:none}
+}
+@media(max-width:600px){
+  .features-grid{grid-template-columns:1fr}
+  .hero__stats{grid-template-columns:1fr;gap:14px}
+  .footer__top{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .container{padding:0 18px}
+  .contact-form{padding:24px 18px}
+  .about-values{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav class="nav" id="mainNav">
+  <div class="container">
+    <div class="nav__inner">
+      <div class="nav__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div>
+      <ul class="nav__links">
+        <li><button onclick="navigate('home')" id="nav-home">Home</button></li>
+        <li><button onclick="navigate('how')" id="nav-how">How It Works</button></li>
+        <li><button onclick="navigate('plans')" id="nav-plans">Pricing</button></li>
+        <li><button onclick="navigate('about')" id="nav-about">About Us</button></li>
+        <li><button onclick="navigate('contact')" id="nav-contact" class="nav__cta-btn">Contact</button></li>
+        <li><div class="lang-toggle"><button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button><button class="lang-btn" data-lang="pt" onclick="setLanguage('pt')">PT</button></div></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero__bg"><div class="hero__bg-circle hero__bg-circle--1"></div><div class="hero__bg-circle hero__bg-circle--2"></div></div>
+    <div class="container">
+      <div class="hero__inner">
+        <div class="hero__content">
+          <div class="hero__eyebrow"><span class="tag tag--on-lime" id="hero-badge">GenAI-Powered &middot; Made for Portugal</span></div>
+          <h1 id="hero-h1">A tool that simplifies your pharmacy's management. Low stocks and <em>expired dates no more!</em></h1>
+          <p class="hero__sub" id="hero-sub">FarmaGest AI automates inventory, patient records and financial reporting for independent Portuguese pharmacies &mdash; so you can focus on your patients.</p>
+          <div class="hero__actions">
+            <button class="btn btn--purple" id="hero-btn1" onclick="navigate('plans')">Start Free Trial &rarr;</button>
+            <button class="btn btn--white-filled" id="hero-btn2" onclick="navigate('how')">See How It Works</button>
+          </div>
+          <div class="hero__stats">
+            <div class="hero__stat"><div class="hero__stat-num">36<span>%</span></div><div class="hero__stat-label" id="stat1">Managers lack time for stock control</div></div>
+            <div class="hero__stat"><div class="hero__stat-num">50<span>%</span></div><div class="hero__stat-label" id="stat2">Patients misuse prescribed medication</div></div>
+            <div class="hero__stat"><div class="hero__stat-num">1</div><div class="hero__stat-label" id="stat3">Single tool for complete management</div></div>
+          </div>
+        </div>
+        <div class="hero__chat-wrapper">
+          <div class="chat-card">
+            <div class="chat-card__header">
+              <div class="chat-card__avatar">F</div>
+              <div class="chat-card__info"><h3 id="chat-title">FarmaGest AI Assistant</h3><p id="chat-status">Online &middot; Powered by AI</p></div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-bubble chat-bubble--ai"><div class="chat-bubble__icon">F</div><div class="chat-bubble__msg" id="chat-welcome">Hello! I'm the FarmaGest AI assistant. How can we help your pharmacy today?</div></div>
+            </div>
+            <div id="chatTyping" class="chat-typing" style="display:none"><div class="chat-typing__dots"><span></span><span></span><span></span></div><span id="chat-thinking">Thinking&hellip;</span></div>
+            <div class="chat-input-area">
+              <input type="text" id="chatInput" placeholder="Ask about stock, patients, pricing&hellip;"/>
+              <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">&#10148;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag" id="feat-tag">Platform Features</span>
+        <h2 id="feat-h2">Everything your pharmacy<br/>needs in one place</h2>
+        <p id="feat-p">From expiry date alerts to AI-generated financial reports &mdash; FarmaGest AI eliminates manual tasks and gives you back time.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-card__num">01</div><h3 id="fc1-h">Smart Inventory Control</h3><p id="fc1-p">Real-time stock tracking with AI-powered alerts before stockouts happen. Automated reorder suggestions based on demand patterns.</p></div>
+        <div class="feature-card"><div class="feature-card__num">02</div><h3 id="fc2-h">Expiry Date Management</h3><p id="fc2-p">Automatic scanning of expiration dates across all product lines. Receive alerts weeks before products expire, avoiding waste and compliance risks.</p></div>
+        <div class="feature-card"><div class="feature-card__num">03</div><h3 id="fc3-h">Patient Record Hub</h3><p id="fc3-p">Centralised digital records for each patient. Monitor medication adherence and flag patients at risk of misuse or non-compliance.</p></div>
+        <div class="feature-card"><div class="feature-card__num">04</div><h3 id="fc4-h">AI Financial Reports</h3><p id="fc4-p">Automatically generate P&amp;L summaries, revenue forecasts and cost analysis &mdash; no accountant required. Updated in real time.</p></div>
+        <div class="feature-card"><div class="feature-card__num">05</div><h3 id="fc5-h">Demand Prediction</h3><p id="fc5-p">Machine learning models trained on your sales history to accurately forecast which medications you will need next week or month.</p></div>
+        <div class="feature-card"><div class="feature-card__num">06</div><h3 id="fc6-h">Instant Automation</h3><p id="fc6-p">Connect with your existing POS system and prescription database. FarmaGest AI processes data automatically &mdash; zero manual data entry.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--cream">
+    <div class="container--narrow">
+      <div class="section-header">
+        <span class="tag" id="steps-tag">How It Works</span>
+        <h2 id="steps-h2">Up and running in 3 simple steps</h2>
+        <p id="steps-p">No IT team required. Most pharmacies are fully operational within one afternoon.</p>
+      </div>
+      <div class="steps-list">
+        <div class="step-item"><div class="step-item__number">01</div><div><h3 id="s1-h">Connect your systems</h3><p id="s1-p">FarmaGest AI integrates seamlessly with your existing POS, prescription database and medication management tools. The setup wizard handles configuration automatically in under 30 minutes.</p></div></div>
+        <div class="step-item"><div class="step-item__number">02</div><div><h3 id="s2-h">AI analyses your data</h3><p id="s2-p">The AI engine processes historical records, stock movements and patient information to build a complete picture of your pharmacy &mdash; identifying risks and opportunities immediately.</p></div></div>
+        <div class="step-item"><div class="step-item__number">03</div><div><h3 id="s3-h">Manage with a single dashboard</h3><p id="s3-p">From one clean interface: control inventory, review patient records, read AI-generated financial reports and receive proactive alerts &mdash; no more spreadsheets.</p></div></div>
+      </div>
+      <div style="text-align:center;margin-top:44px"><button class="btn btn--lime" id="steps-btn" onclick="navigate('how')">Explore All Features &rarr;</button></div>
+    </div>
+  </section>
+
+
+
+  <section class="cta-section">
+    <div class="container">
+      <h2 id="cta-home-h">Start transforming your pharmacy today</h2>
+      <p id="cta-home-p">A smarter, automated management solution tailored to the needs of Portuguese pharmacies.</p>
+      <button class="btn btn--purple" onclick="navigate('plans')" id="cta-home-btn">View Pricing &rarr;</button>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline" id="foot-tag1">Automate your pharmacy's management with AI technology.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI. All rights reserved. Made in Portugal &#127477;&#127481;</p><div class="footer__legal"><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy</a><a onclick="navigate('terms')" class="foot-link-terms">Terms</a><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></div></div></div></footer>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="page" id="page-how">
+  <div class="page-hero"><div class="container"><span class="tag tag--on-lime" id="hiw-tag">Platform Deep-Dive</span><h1 id="hiw-h1">One tool.<br/><em>Every need covered.</em></h1><p id="hiw-p">Discover how FarmaGest AI's four core modules work together to automate every corner of your pharmacy.</p></div></div>
+  <section class="features-deep"><div class="container">
+    <div class="feature-deep-item">
+      <div class="feature-deep-item__text"><span class="tag" id="m1-tag">Module 01</span><h2 id="m1-h">Intelligent Inventory &amp; Stock Control</h2><p id="m1-p1">Never face an empty shelf again. FarmaGest AI continuously monitors stock levels in real time and uses AI to predict when each product will run out &mdash; before it happens.</p><p id="m1-p2">The system compares current stock against predicted demand and automatically flags items that need reordering, accounting for seasonality, local demand patterns and supplier lead times.</p><ul class="feature-deep-item__list"><li id="m1-l1">Real-time stock level monitoring across all product categories</li><li id="m1-l2">AI-powered reorder suggestions based on demand history</li><li id="m1-l3">Expiry date scanning with multi-week advance alerts</li><li id="m1-l4">Batch lot tracking for regulatory compliance</li><li>Automated supplier ordering integration</li></ul></div>
+      <div class="feature-deep-item__visual"><div class="feature-visual-inner"><div class="mini-card"><div class="mini-card__label">Stock Health Score</div><div class="mini-card__value">94<span style="font-size:.9rem;color:var(--ink-soft)">/100</span></div><div class="mini-card__sub">&#8593; 12 points this month</div></div><div class="mini-card"><div class="mini-card__label">Low Stock Alerts</div><div style="margin-top:8px"><div class="mini-bar-row"><span class="mini-bar-label">Paracetamol</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:18%"></div></div><span class="mini-bar-pct">18%</span></div><div class="mini-bar-row"><span class="mini-bar-label">Ibuprofen</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:72%"></div></div><span class="mini-bar-pct">72%</span></div><div class="mini-bar-row"><span class="mini-bar-label">Amoxicillin</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:45%"></div></div><span class="mini-bar-pct">45%</span></div></div></div><div class="mini-alert mini-alert--warn">&#9888; Paracetamol 500mg &middot; Reorder now &middot; 3 days remaining</div></div></div>
+    </div>
+    <div class="feature-deep-item">
+      <div class="feature-deep-item__text"><span class="tag" id="m2-tag">Module 02</span><h2 id="m2-h">Expiry Date Management &amp; Compliance</h2><p id="m2-p1">Expired products on the shelf are a compliance risk, a revenue drain, and a safety hazard. FarmaGest AI eliminates this entirely with automated expiry tracking built into the daily workflow.</p><p id="m2-p2">Receive tiered alerts &mdash; 90, 60, 30 and 7 days before expiry &mdash; so there is time to discount, return or redistribute products rather than writing them off.</p><ul class="feature-deep-item__list"><li id="m2-l1">Tiered expiry alerts at 90, 60, 30 and 7 days</li><li id="m2-l2">Automatic removal suggestions from active stock</li><li id="m2-l3">Supplier return documentation generation</li><li id="m2-l4">Monthly waste reduction reporting</li><li id="m2-l5">INFARMED-compatible compliance audit trails</li></ul></div>
+      <div class="feature-deep-item__visual"><div class="feature-visual-inner"><div class="mini-card"><div class="mini-card__label">Expiry Overview</div><div style="margin-top:10px;display:flex;gap:10px"><div style="flex:1;text-align:center"><div style="font-size:1.5rem;font-weight:800;color:#d32f2f">3</div><div style="font-size:9px;color:var(--ink-soft)">Expired</div></div><div style="flex:1;text-align:center"><div style="font-size:1.5rem;font-weight:800;color:#F0A000">8</div><div style="font-size:9px;color:var(--ink-soft)">&lt;30 days</div></div><div style="flex:1;text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--lime-dark)">24</div><div style="font-size:9px;color:var(--ink-soft)">&lt;90 days</div></div></div></div><div class="mini-alert mini-alert--warn">&#128197; Aspirin 100mg &middot; Expires 15 Apr &middot; 18 units</div><div class="mini-alert mini-alert--ok">&#10003; Vitamin D3 &middot; Returned to supplier &middot; Saved &euro;42</div><div class="mini-card"><div class="mini-card__label">Waste Saved This Year</div><div class="mini-card__value">&euro;1,240</div><div class="mini-card__sub">vs &euro;4,890 same period last year</div></div></div></div>
+    </div>
+    <div class="feature-deep-item">
+      <div class="feature-deep-item__text"><span class="tag" id="m3-tag">Module 03</span><h2 id="m3-h">Patient Record Management</h2><p id="m3-p1">Up to 50% of patients misuse prescribed medication. FarmaGest AI helps build a real relationship with every patient &mdash; tracking medication history, flagging adherence issues, and empowering pharmacists to intervene at the right moment.</p><p id="m3-p2">Every patient interaction is automatically logged and analysed, building a longitudinal health profile that makes personalised care possible without extra manual work.</p><ul class="feature-deep-item__list"><li id="m3-l1">Centralised digital profiles for every patient</li><li id="m3-l2">Medication adherence tracking and alerts</li><li id="m3-l3">Interaction and contraindication warnings</li><li id="m3-l4">Chronic condition monitoring dashboards</li><li>GDPR-compliant data storage and access control</li></ul></div>
+      <div class="feature-deep-item__visual"><div class="feature-visual-inner"><div class="mini-card"><div class="mini-card__label">Patient Monitoring</div><div style="margin-top:10px"><div class="mini-patient-row"><div class="mini-patient-avatar">MS</div><div class="mini-patient-info"><div class="mini-patient-name">Maria Silva</div><div class="mini-patient-med">Metformin 500mg &middot; Last fill 22 days ago</div></div><span class="mini-patient-badge mini-patient-badge--warn">Overdue</span></div><div class="mini-patient-row"><div class="mini-patient-avatar">JP</div><div class="mini-patient-info"><div class="mini-patient-name">Jo&atilde;o Pereira</div><div class="mini-patient-med">Lisinopril 10mg &middot; Refilled on time</div></div><span class="mini-patient-badge mini-patient-badge--ok">On track</span></div><div class="mini-patient-row"><div class="mini-patient-avatar">AF</div><div class="mini-patient-info"><div class="mini-patient-name">Ana Ferreira</div><div class="mini-patient-med">Atorvastatin 20mg &middot; 3 days remaining</div></div><span class="mini-patient-badge mini-patient-badge--ok">Active</span></div></div></div><div class="mini-card"><div class="mini-card__label">Adherence Rate</div><div class="mini-card__value">82<span style="font-size:.9rem">%</span></div><div class="mini-card__sub">&#8593; 19% since using FarmaGest AI</div></div></div></div>
+    </div>
+    <div class="feature-deep-item">
+      <div class="feature-deep-item__text"><span class="tag" id="m4-tag">Module 04</span><h2 id="m4-h">AI-Powered Financial Analytics</h2><p id="m4-p1">FarmaGest AI automatically processes every sale, return and purchase to generate clear, actionable financial intelligence &mdash; from daily cash flow to quarterly reports &mdash; without lifting a finger.</p><p id="m4-p2">The AI learns patterns and delivers forward-looking forecasts, helping make smarter purchasing decisions.</p><ul class="feature-deep-item__list"><li id="m4-l1">Automated daily, weekly and monthly revenue reports</li><li id="m4-l2">Margin analysis by product category</li><li id="m4-l3">AI-generated revenue forecasts with confidence ranges</li><li id="m4-l4">Cost-per-prescription and profitability metrics</li><li id="m4-l5">Export-ready reports for accountants and tax filings</li></ul></div>
+      <div class="feature-deep-item__visual"><div class="feature-visual-inner"><div class="mini-card"><div class="mini-card__label">Monthly Revenue</div><div class="mini-card__value">&euro;38,420</div><div class="mini-card__sub">&#8593; 14.2% vs last month</div></div><div class="mini-card"><div class="mini-card__label">Revenue Trend (6 months)</div><div class="mini-chart-row" style="margin-top:10px"><div class="mini-bar-chart" style="height:45%"></div><div class="mini-bar-chart" style="height:55%"></div><div class="mini-bar-chart" style="height:62%"></div><div class="mini-bar-chart" style="height:70%"></div><div class="mini-bar-chart" style="height:80%"></div><div class="mini-bar-chart" style="height:100%;background:var(--lime-dark)"></div></div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:8px;color:var(--ink-soft)">Oct</span><span style="font-size:8px;color:var(--ink-soft)">Nov</span><span style="font-size:8px;color:var(--ink-soft)">Dec</span><span style="font-size:8px;color:var(--ink-soft)">Jan</span><span style="font-size:8px;color:var(--ink-soft)">Feb</span><span style="font-size:8px;color:var(--lime-dark);font-weight:700">Mar</span></div></div><div class="mini-tag-row"><span class="mini-tag">Generic Drugs</span><span class="mini-tag">Vitamins</span><span class="mini-tag">Dermatology</span></div></div></div>
+    </div>
+  </div></section>
+  <section class="cta-section"><div class="container"><h2 id="cta-how-h">Ready to automate your pharmacy?</h2><p id="cta-how-p">Low stocks and expired dates no more. The smarter way to manage your pharmacy.</p><button class="btn btn--purple" onclick="navigate('plans')" id="cta-how-btn">See Pricing &rarr;</button></div></section>
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI. All rights reserved. Made in Portugal &#127477;&#127481;</p><div class="footer__legal"><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy</a><a onclick="navigate('terms')" class="foot-link-terms">Terms</a><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></div></div></div></footer>
+</div>
+
+<!-- PRICING -->
+<div class="page" id="page-plans">
+  <div class="page-hero"><div class="container"><span class="tag tag--on-lime" id="plans-tag">Transparent Pricing</span><h1 id="plans-h1">Simple, honest<br/><em>pricing</em></h1><p id="plans-p">Choose the option that best suits your pharmacy's needs.</p></div></div>
+  <div style="background:var(--cream)"><div class="container"><div class="plans-grid">
+    <div class="plan-card">
+      <div class="plan-card__name" id="p1-name">Standard</div>
+      <h3 id="p1-h3">Complete automation for your independent pharmacy.</h3>
+      <p class="plan-card__tagline" id="p1-tag">Everything you need to eliminate manual work and run your pharmacy on autopilot.</p>
+      <div class="plan-price"><div class="plan-price__amount"><sup>&euro;</sup>49</div><div class="plan-price__period" id="p1-period">per month &middot; cancel any time &middot; 14-day free trial</div></div>
+      <ul class="plan-features">
+        <li id="p1f1">Smart inventory &amp; stock control</li><li id="p1f2">Expiry date alerts (90 / 60 / 30 / 7 days)</li><li id="p1f3">Unlimited patient records</li><li id="p1f4">AI-generated financial reports</li><li id="p1f5">Demand forecasting engine</li><li id="p1f6">POS &amp; prescription database integration</li><li id="p1f7">INFARMED compliance export</li><li id="p1f8">Up to 5 user accounts</li><li id="p1f9">Priority email &amp; chat support</li>
+      </ul>
+      <button class="btn btn--lime" id="p1-btn" onclick="navigate('contact')">Start Free Trial &rarr;</button>
+    </div>
+    <div class="plan-card plan-card--featured">
+      <div class="plan-card__badge" id="p2-badge">For Larger Pharmacies</div>
+      <div class="plan-card__name" id="p2-name">Enterprise</div>
+      <h3 id="p2-h3">Custom solution for pharmacy groups and multi-location operations.</h3>
+      <p class="plan-card__tagline" id="p2-tag">Centralised management across all locations, dedicated support and custom integrations.</p>
+      <div class="plan-price"><div class="plan-price__amount" id="p2-amount" style="font-size:2.6rem;padding-top:6px">Custom</div><div class="plan-price__period" id="p2-period">pricing tailored to your needs</div></div>
+      <ul class="plan-features">
+        <li id="p2f1">Everything in Standard</li><li id="p2f2">Unlimited locations</li><li id="p2f3">Unlimited user accounts</li><li id="p2f4">Cross-location analytics &amp; reporting</li><li id="p2f5">Custom API integrations</li><li id="p2f6">Dedicated account manager</li><li id="p2f7">On-site onboarding &amp; training</li><li id="p2f8">Custom contract &amp; billing</li>
+      </ul>
+      <button class="btn btn--purple" id="p2-btn" onclick="navigate('contact')">Contact Us &rarr;</button>
+    </div>
+  </div></div></div>
+  <section class="section">
+    <div class="container--narrow">
+      <div class="section-header"><span class="tag" id="faq-tag">FAQ</span><h2 id="faq-h2">Common questions about pricing</h2></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:var(--cream);border:1.5px solid var(--border-soft);border-radius:14px;padding:22px 26px"><strong class="faq-q" id="faq1-q">Can I cancel at any time?</strong><p class="faq-a" id="faq1-a">Yes. FarmaGest AI is a month-to-month subscription and you can cancel at any time with no penalty.</p></div>
+        <div style="background:var(--cream);border:1.5px solid var(--border-soft);border-radius:14px;padding:22px 26px"><strong class="faq-q" id="faq2-q">How long does the setup take?</strong><p class="faq-a" id="faq2-a">Most pharmacies are fully set up within one afternoon. The onboarding wizard guides you through every step.</p></div>
+        <div style="background:var(--cream);border:1.5px solid var(--border-soft);border-radius:14px;padding:22px 26px"><strong class="faq-q" id="faq3-q">Is there a free trial for the Standard plan?</strong><p class="faq-a" id="faq3-a">Yes &mdash; 14 days completely free, no credit card required. Experience the full platform before committing.</p></div>
+        <div style="background:var(--cream);border:1.5px solid var(--border-soft);border-radius:14px;padding:22px 26px"><strong class="faq-q" id="faq4-q">Is my patient data safe?</strong><p class="faq-a" id="faq4-a">All data is encrypted at rest and in transit, hosted on EU servers and fully GDPR-compliant. Data belongs to the pharmacy at all times.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-section"><div class="container"><h2 id="cta-plans-h">Not sure which option is right for you?</h2><p id="cta-plans-p">Talk to the team and the best fit for your pharmacy will be recommended.</p><button class="btn btn--purple" onclick="navigate('contact')" id="cta-plans-btn">Talk to Us &rarr;</button></div></section>
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI. All rights reserved.</p><div class="footer__legal"><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy</a><a onclick="navigate('terms')" class="foot-link-terms">Terms</a><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></div></div></div></footer>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="page-hero page-hero--left">
+    <div class="container">
+      <div class="about-hero-inner">
+        <div><span class="tag tag--on-lime" id="about-tag" style="margin-bottom:18px;display:inline-block">Our Story</span><h1 id="about-h1" style="text-align:left">Built by people<br/>who understand<br/><em>pharmacy pain.</em></h1><p id="about-hero-p" style="margin-top:14px;text-align:left">FarmaGest AI was born from a simple frustration: the tools available to Portugal's 2,900 independent pharmacies were outdated, disconnected and demanded too much manual effort.</p></div>
+        <div class="about-card"><div style="text-align:center;padding:16px"><h3 id="about-mission-title" style="font-family:var(--font-serif);font-size:1.5rem;font-weight:300;color:white;margin-bottom:12px">Our Mission</h3><p id="about-mission-quote" style="font-size:14px;color:rgba(255,255,255,.75);font-weight:300;line-height:1.75">"Grow your business by strengthening your patients and your company's management with the help of a pharmacy automation tool powered by AI technology."</p><div style="margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.15);display:flex;justify-content:space-around"><div style="text-align:center"><div style="font-family:var(--font-serif);font-size:1.9rem;font-weight:300;color:white">2026</div><div style="font-size:10px;color:rgba(255,255,255,.4)" id="about-founded">Founded</div></div><div style="text-align:center"><div style="font-family:var(--font-serif);font-size:1.9rem;font-weight:300;color:white">&#127477;&#127481;</div><div style="font-size:10px;color:rgba(255,255,255,.4)" id="about-country">Portugal-first</div></div></div></div></div>
+      </div>
+    </div>
+  </div>
+  <section class="about-mission"><div class="container"><div class="about-mission__grid">
+    <div><span class="tag" id="prob-tag" style="margin-bottom:14px;display:inline-block">The Problem We Solve</span><h2 id="prob-h2">Portuguese pharmacies have been underserved for too long</h2><p id="prob-p1">Research from Universidade Lus&oacute;fona revealed that 36% of pharmacy managers know they need better stock management but simply lack the time to do it properly. The Ordem dos Farm&acirc;ceuticos estimates that up to 50% of patients misuse prescribed medication.</p><p id="prob-p2">These are not just numbers. They represent lost revenue, wasted medication, and patients at risk. FarmaGest AI was built to close this gap &mdash; making enterprise-grade pharmacy management accessible to every independent pharmacy in Portugal.</p><p id="prob-p3">The AI does not just report what happened. It tells you what is about to happen, and what should be done about it.</p></div>
+    <div><span class="tag" id="val-tag" style="margin-bottom:14px;display:inline-block">Our Values</span><h2 id="val-h2">What drives us every day</h2><div class="about-values"><div class="value-card"><div class="value-card__dot"></div><h4 id="v1-h">Precision</h4><p id="v1-p">Every alert, report and prediction generated must be actionable and trustworthy.</p></div><div class="value-card"><div class="value-card__dot"></div><h4 id="v2-h">Patient First</h4><p id="v2-p">The end goal of every feature built is a healthier patient community.</p></div><div class="value-card"><div class="value-card__dot"></div><h4 id="v3-h">Local Roots</h4><p id="v3-p">Built in Portugal, for Portugal. Local regulations and market realities are well understood.</p></div><div class="value-card"><div class="value-card__dot"></div><h4 id="v4-h">Privacy</h4><p id="v4-p">Patient data is sacred. GDPR compliance is built in by design, not by checkbox.</p></div></div></div>
+  </div></div></section>
+  <section class="cta-section"><div class="container"><h2 id="cta-about-h">Join the FarmaGest AI movement</h2><p id="cta-about-p">Promote a healthier community of patients by tracking their health and the finances of your pharmacy.</p><button class="btn btn--purple" onclick="navigate('contact')" id="cta-about-btn">Get in Touch &rarr;</button></div></section>
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI. Made in Portugal &#127477;&#127481;</p></div></div></footer>
+</div>
+
+<!-- CONTACT -->
+<div class="page" id="page-contact">
+  <div class="page-hero"><div class="container"><span class="tag tag--on-lime" id="con-tag">Get In Touch</span><h1 id="con-h1">Let's talk about<br/>your pharmacy</h1><p id="con-sub">Understanding your needs and showing how FarmaGest AI can help is the goal.</p></div></div>
+  <section class="section"><div class="container"><div class="contact-grid">
+    <div class="contact-info">
+      <h2 id="con-info-h">Here to help your pharmacy thrive</h2>
+      <p id="con-info-p">Whether a single pharmacy manager curious about automation, or a group looking for an enterprise solution &mdash; the right fit will be found.</p>
+      <div class="contact-details">
+        <div class="contact-detail"><div class="contact-detail__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><strong id="con-office-lbl">Office</strong><span>Avenida da Liberdade, 110, Lisboa, Portugal</span></div></div>
+        <div class="contact-detail"><div class="contact-detail__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg></div><div><strong id="con-email-lbl">Email</strong><span>info&#64;farmagestai.pt</span></div></div>
+        <div class="contact-detail"><div class="contact-detail__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.77 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/></svg></div><div><strong id="con-phone-lbl">Phone</strong><span>+351 210 000 000</span></div></div>
+        <div class="contact-detail"><div class="contact-detail__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><strong id="con-hours-lbl">Hours</strong><span id="con-hours-val">Monday &ndash; Friday, 9:00 &ndash; 18:00 WET</span></div></div>
+      </div>
+    </div>
+    <div class="contact-form">
+      <div id="contactFormContent">
+        <h3 id="form-title" style="font-family:var(--font-serif);font-weight:300;font-size:1.5rem;color:var(--ink);margin-bottom:5px">Send us a message</h3>
+        <p id="form-sub" style="font-size:14px;color:var(--ink-soft);font-weight:300;margin-bottom:26px">Responses are typically sent within one business day.</p>
+        <div class="form-row">
+          <div class="form-group"><label id="lbl-fname">First Name *</label><input type="text" id="f-fname" placeholder="Ana"/></div>
+          <div class="form-group"><label id="lbl-lname">Last Name *</label><input type="text" id="f-lname" placeholder="Martins"/></div>
+        </div>
+        <div class="form-group"><label id="lbl-email">Email *</label><input type="email" id="f-email" placeholder="ana&#64;farmaciacentral.pt"/></div>
+        <div class="form-group"><label id="lbl-pharmacy">Pharmacy Name</label><input type="text" id="f-pharmacy" placeholder="Farm&aacute;cia Central"/></div>
+        <div class="form-group"><label id="lbl-interest">I'm interested in</label><select id="f-interest"><option>Standard Plan (&euro;49/mo)</option><option>Enterprise (Custom)</option><option>General Information</option><option>Technical Support</option></select></div>
+        <div class="form-group"><label id="lbl-msg">Message</label><textarea id="f-msg" placeholder="Tell us about your pharmacy and what you are looking to achieve..."></textarea></div>
+        <button class="btn btn--lime form-submit" id="form-submit-btn" onclick="submitForm()">Send Message &rarr;</button>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <div class="form-success__icon">&#10003;</div>
+        <h3 id="success-h">Message received!</h3>
+        <p id="success-p">Thank you for reaching out. A member of the team will be in touch within one business day.</p>
+      </div>
+    </div>
+  </div></div></section>
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI. Made in Portugal &#127477;&#127481;</p></div></div></footer>
+</div>
+
+<!-- PRIVACY POLICY -->
+<div class="page" id="page-privacy">
+  <div class="page-hero"><div class="container"><span class="tag tag--on-lime">Legal</span><h1>Privacy Policy</h1><p>How information is collected, used and protected.</p></div></div>
+  <section class="legal-content"><div class="container--narrow">
+    <p class="legal-lang-note" id="legal-note-privacy"><strong>Nota:</strong> Este documento legal est&#225; dispon&#237;vel apenas em ingl&#234;s para garantir precis&#227;o jur&#237;dica.</p>
+    <p class="legal-date">Last updated: 1 January 2026</p>
+    <p>FarmaGest AI is committed to protecting the privacy of customers and the patients whose data is managed through the platform. This Privacy Policy explains how information is collected, used, disclosed and safeguarded when you use the FarmaGest AI platform.</p>
+    <h2>1. Information Collected</h2><h3>Account and Business Information</h3>
+    <p>When registering for FarmaGest AI, the following is collected: name, email address, pharmacy name, billing address, phone number and payment information. This information is necessary to provide and bill for the services.</p>
+    <h3>Pharmacy Operational Data</h3>
+    <p>The platform processes data imported or generated through normal use, including inventory records, stock movement history, financial transactions and sales data. This data remains the property of the pharmacy at all times and is processed solely to provide the services described in these Terms of Service.</p>
+    <h3>Patient Health Data</h3>
+    <p>FarmaGest AI processes patient records including names, contact details, prescription history and medication adherence data on behalf of the pharmacy (the data controller). FarmaGest AI acts as a data processor under GDPR Article 28. Patient data is never sold, shared with third parties for commercial purposes, or used for any purpose other than providing the platform functionality to the controlling pharmacy.</p>
+    <h3>Usage Data</h3>
+    <p>Certain information about how you interact with the platform is automatically collected, including log data, IP addresses, browser type, pages visited and actions taken. This information is used to improve the platform, diagnose technical issues and ensure security.</p>
+    <h2>2. How Information Is Used</h2>
+    <ul><li>To provide, maintain and improve the FarmaGest AI platform</li><li>To process transactions and send related billing communications</li><li>To send product updates, security alerts and support messages</li><li>To respond to comments, questions and support requests</li><li>To monitor and analyse usage patterns to improve user experience</li><li>To detect, investigate and prevent fraudulent transactions and other illegal activities</li><li>To comply with legal obligations</li></ul>
+    <h2>3. Data Storage and Security</h2>
+    <p>All data is stored on servers located within the European Union. Industry-standard security measures are implemented including AES-256 encryption at rest, TLS 1.3 encryption in transit, regular security audits, and strict access controls. Only authorised personnel with a legitimate need can access data.</p>
+    <p>FarmaGest AI maintains ISO 27001-aligned information security practices and conducts penetration testing at least annually.</p>
+    <h2>4. Data Retention</h2>
+    <p>Account data is retained for the duration of the subscription plus 12 months after cancellation, after which it is permanently deleted. Deletion of data may be requested at any time by contacting FarmaGest AI via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a>. Patient health data will be deleted within 30 days of a deletion request, except where legal obligations require otherwise.</p>
+    <h2>5. Sharing of Information</h2>
+    <p>FarmaGest AI does not sell personal information. Information may be shared with third-party service providers assisting in operating the platform (such as cloud hosting providers and payment processors), subject to strict data processing agreements. Information may also be disclosed when required by law or to protect the rights and safety of users.</p>
+    <h2>6. Your Rights</h2>
+    <p>Under GDPR and Portuguese data protection law, you have the right to access, correct, delete, restrict processing of, or obtain a portable copy of your personal data. To exercise any of these rights, contact FarmaGest AI via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a>. Responses will be provided within 30 days.</p>
+    <h2>7. Contact</h2>
+    <p>For any privacy-related questions or to exercise your rights, contact the Data Protection Officer via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a>. FarmaGest AI &mdash; Avenida da Liberdade, 110, Lisboa, Portugal.</p>
+  </div></section>
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI.</p></div></div></footer>
+</div>
+
+<!-- TERMS -->
+<div class="page" id="page-terms">
+  <div class="page-hero"><div class="container"><span class="tag tag--on-lime">Legal</span><h1>Terms of Service</h1><p>The terms and conditions governing use of FarmaGest AI.</p></div></div>
+  <section class="legal-content"><div class="container--narrow">
+    <p class="legal-lang-note" id="legal-note-terms"><strong>Nota:</strong> Este documento legal est&#225; dispon&#237;vel apenas em ingl&#234;s para garantir precis&#227;o jur&#237;dica.</p>
+    <p class="legal-date">Last updated: 1 January 2026</p>
+    <p>Please read these Terms of Service carefully before using the FarmaGest AI platform operated by FarmaGest AI, Lda. By accessing or using the Service, you agree to be bound by these Terms.</p>
+    <h2>1. Acceptance of Terms</h2>
+    <p>By creating an account or using FarmaGest AI, you confirm that you are authorised to enter into a binding agreement on behalf of your pharmacy or organisation, and that use of the platform will comply with all applicable laws and regulations, including Portuguese pharmaceutical regulations and GDPR.</p>
+    <h2>2. Description of Service</h2>
+    <p>FarmaGest AI provides a cloud-based pharmacy management platform that includes inventory management, expiry date tracking, patient record management, financial analytics, and AI-powered demand forecasting tools. The specific features available depend on the subscription plan.</p>
+    <h2>3. Subscription and Payment</h2>
+    <p>Subscriptions are billed monthly or annually in advance. You authorise FarmaGest AI to charge your payment method on each renewal date. Prices are stated in euros and inclusive of applicable Portuguese VAT. Pricing may change with 30 days notice. Continued use of the Service after a price change constitutes acceptance of the new pricing.</p>
+    <h3>Free Trial</h3>
+    <p>The Standard plan includes a 14-day free trial. No credit card is required during the trial period. At the end of the trial, payment details must be provided to continue using the Service.</p>
+    <h2>4. Cancellation and Refunds</h2>
+    <p>Subscriptions may be cancelled at any time from within account settings. Cancellation takes effect at the end of the current billing period. Refunds for partial months are not provided. If you believe a charge was made in error, contact FarmaGest AI via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a> within 30 days of the charge.</p>
+    <h2>5. Your Responsibilities</h2>
+    <ul><li>You are responsible for maintaining the confidentiality of your account credentials.</li><li>You must ensure that use of the platform complies with all applicable pharmacy regulations and data protection laws.</li><li>You must not use the platform for any unlawful purpose or in any way that could damage or impair the Service.</li><li>You are solely responsible for the accuracy and legality of data you input into the platform.</li><li>Any unauthorised use of your account must be promptly reported to FarmaGest AI.</li></ul>
+    <h2>6. Intellectual Property</h2>
+    <p>FarmaGest AI and all related software, algorithms, designs, text and graphics are the intellectual property of FarmaGest AI, Lda. These Terms do not grant you any rights to this intellectual property. Your data remains yours and a limited licence is granted to process it solely to provide the Service.</p>
+    <h2>7. Limitation of Liability</h2>
+    <p>To the maximum extent permitted by law, FarmaGest AI shall not be liable for any indirect, incidental, special, consequential or punitive damages, or any loss of profits or revenues. Total liability for any claim shall not exceed the amount paid in the 12 months preceding the claim. The Service is provided for management assistance only and does not constitute medical or pharmaceutical advice.</p>
+    <h2>8. Termination</h2>
+    <p>FarmaGest AI reserves the right to suspend or terminate your account if you breach these Terms, fail to pay any amounts due, or if required to do so by law. Upon termination, access to the Service will be lost and data will be retained for 12 months as described in the Privacy Policy before permanent deletion.</p>
+    <h2>9. Governing Law</h2>
+    <p>These Terms are governed by the laws of Portugal. Any dispute arising from these Terms shall be subject to the exclusive jurisdiction of the courts of Lisbon, Portugal.</p>
+    <h2>10. Contact</h2>
+    <p>For any questions about these Terms, contact FarmaGest AI via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a>.</p>
+  </div></section>
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI.</p></div></div></footer>
+</div>
+
+<!-- GDPR -->
+<div class="page" id="page-gdpr">
+  <div class="page-hero"><div class="container"><span class="tag tag--on-lime">Legal</span><h1>GDPR Compliance</h1><p>FarmaGest AI commitment to protecting data under EU regulation.</p></div></div>
+  <section class="legal-content"><div class="container--narrow">
+    <p class="legal-lang-note" id="legal-note-gdpr"><strong>Nota:</strong> Este documento legal est&#225; dispon&#237;vel apenas em ingl&#234;s para garantir precis&#227;o jur&#237;dica.</p>
+    <p class="legal-date">Last updated: 1 January 2026</p>
+    <p>FarmaGest AI is fully committed to compliance with the General Data Protection Regulation (EU) 2016/679 and the Portuguese Lei n.&#186; 58/2019. This page describes GDPR obligations, roles, and the rights available to data subjects.</p>
+    <h2>1. Roles Under GDPR</h2><h3>Pharmacy as Data Controller</h3>
+    <p>The pharmacy using FarmaGest AI is the <strong>data controller</strong> for patient and employee personal data processed through the platform. The pharmacy determines the purposes and means of processing and is responsible for ensuring a lawful basis for that processing.</p>
+    <h3>FarmaGest AI as Data Processor</h3>
+    <p>FarmaGest AI acts as a <strong>data processor</strong> under GDPR Article 28, processing personal data only on documented instructions from the data controller (the pharmacy). Personal data is not processed for purposes beyond what is necessary to provide the Service.</p>
+    <h2>2. Data Processing Agreement (DPA)</h2>
+    <p>All customers are covered by the standard Data Processing Agreement, which is incorporated into these terms by reference. The DPA governs obligations as a processor, including technical and organisational security measures, sub-processor management, and assistance with data subject requests. To request a signed copy of the DPA, contact FarmaGest AI via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a>.</p>
+    <h2>3. Legal Bases for Processing</h2>
+    <p>FarmaGest AI processes personal data on the following legal bases:</p>
+    <ul><li><strong>Contract performance</strong> (Article 6(1)(b)): processing necessary to provide the subscribed Service.</li><li><strong>Legitimate interests</strong> (Article 6(1)(f)): processing for security monitoring, fraud prevention and service improvement.</li><li><strong>Legal obligation</strong> (Article 6(1)(c)): processing required by applicable law.</li><li><strong>Explicit consent</strong> (Article 9(2)(a)): where the pharmacy obtains patient consent for health data processing.</li></ul>
+    <h2>4. Data Subject Rights</h2>
+    <p>Individuals whose data is processed through the platform have the following rights under GDPR:</p>
+    <ul><li><strong>Right of access</strong> (Article 15): to obtain confirmation of and access to their personal data.</li><li><strong>Right to rectification</strong> (Article 16): to correct inaccurate personal data.</li><li><strong>Right to erasure</strong> (Article 17): to request deletion where no overriding legal basis exists.</li><li><strong>Right to restriction</strong> (Article 18): to restrict how data is processed.</li><li><strong>Right to data portability</strong> (Article 20): to receive data in a structured, machine-readable format.</li><li><strong>Right to object</strong> (Article 21): to object to processing based on legitimate interests.</li></ul>
+    <p>FarmaGest AI will assist pharmacies in responding to data subject requests within the 30-day statutory timeframe. Contact FarmaGest AI via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a> for assistance.</p>
+    <h2>5. International Transfers</h2>
+    <p>All personal data is processed and stored within the European Economic Area (EEA). Personal data is not transferred to third countries. Cloud infrastructure providers are certified under EU-compliant data transfer frameworks.</p>
+    <h2>6. Sub-processors</h2>
+    <p>FarmaGest AI uses a limited number of carefully vetted sub-processors to operate the platform, including cloud hosting, payment processing and customer support tools. All sub-processors are bound by GDPR-compliant data processing agreements. A full list of sub-processors is available on request via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a>.</p>
+    <h2>7. Data Breach Notification</h2>
+    <p>In the event of a personal data breach affecting customer data, affected pharmacies will be notified within 72 hours of FarmaGest AI becoming aware, in accordance with GDPR Article 33. A comprehensive incident response plan is maintained and regular security testing is conducted to minimise the risk of breaches.</p>
+    <h2>8. Data Protection Officer</h2>
+    <p>FarmaGest AI has appointed a Data Protection Officer (DPO) who can be contacted via <a onclick="navigate('contact')" style="color:var(--lime-dark);cursor:pointer;text-decoration:underline">the contact page</a>.</p>
+    <p>You also have the right to lodge a complaint with the Portuguese supervisory authority, the <strong>Comiss&#227;o Nacional de Prote&#231;&#227;o de Dados (CNPD)</strong>, at www.cnpd.pt.</p>
+  </div></section>
+  <footer class="footer"><div class="container"><div class="footer__top"><div><div class="footer__logo" onclick="navigate('home')">FarmaGest <span>AI</span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div><div class="footer__col"><h4 class="foot-col-product">Product</h4><ul class="footer__links"><li><button onclick="navigate('how')" class="foot-link-how">How It Works</button></li><li><button onclick="navigate('plans')" class="foot-link-plans">Pricing</button></li></ul></div><div class="footer__col"><h4 class="foot-col-company">Company</h4><ul class="footer__links"><li><button onclick="navigate('about')" class="foot-link-about">About Us</button></li><li><button onclick="navigate('contact')" class="foot-link-contact">Contact</button></li></ul></div><div class="footer__col"><h4 class="foot-col-legal">Legal</h4><ul class="footer__links"><li><a onclick="navigate('privacy')" class="foot-link-privacy">Privacy Policy</a></li><li><a onclick="navigate('terms')" class="foot-link-terms">Terms of Service</a></li><li><a onclick="navigate('gdpr')" class="foot-link-gdpr">GDPR</a></li></ul></div></div><div class="footer__bottom"><p class="footer__copy foot-copy">&copy; 2026 FarmaGest AI.</p></div></div></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── ROUTING ── */
+function navigate(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var t=document.getElementById('page-'+page);
+  if(t)t.classList.add('active');
+  document.querySelectorAll('.nav__links button').forEach(function(b){b.classList.remove('active');});
+  var nb=document.getElementById('nav-'+page);
+  if(nb)nb.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(currentLang==='pt') setTimeout(function(){applyLang('pt');},10);
+}
+window.addEventListener('scroll',function(){
+  var n=document.getElementById('mainNav');
+  if(window.scrollY>40)n.classList.add('scrolled');
+  else n.classList.remove('scrolled');
+});
+/* ── FORM ── */
+function submitForm(){
+  var fname=document.getElementById('f-fname').value.trim();
+  var email=document.getElementById('f-email').value.trim();
+  if(!fname||!email){showToast(currentLang==='pt'?'Preencha o nome e email.':'Please fill in your name and email.');return;}
+  document.getElementById('contactFormContent').style.display='none';
+  document.getElementById('formSuccess').style.display='block';
+  showToast(currentLang==='pt'?'Mensagem enviada!':'Message sent!');
+}
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3500);
+}
+/* ── CHATBOT ── */
+document.getElementById('chatInput').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
+var chatHistory=[];
+var SYSTEM_PROMPTS={
+  en:'You are the FarmaGest AI Assistant. FarmaGest AI is an AI-powered pharmacy management tool for small Portuguese pharmacies. It helps with inventory and stock management, expiry date tracking, patient record management, AI-powered financial reports, demand forecasting, and pharmacy automation. Pages: Home, How It Works (features), Pricing (Standard 49 euros/mo, Enterprise custom), About Us, Contact. When a user asks something related respond in 1-2 sentences and END with one of: {"redirect":"how"} or {"redirect":"plans"} or {"redirect":"about"} or {"redirect":"contact"} or {"redirect":"home"}. Pricing to plans. Features to how. Company to about. Demo/signup to contact. If unrelated politely decline with no redirect. Reply in English.',
+  pt:'FarmaGest AI é o Assistente FarmaGest AI. A FarmaGest AI é uma ferramenta de gestão de farmacias com IA para pequenas farmacias portuguesas. Ajuda com gestão de stock, datas de validade, registos de doentes, relatórios financeiros, previsão de procura e automação. Paginas: Início, Como Funciona (funcionalidades), Preços (Standard 49 euros/mês, Enterprise personalizado), Sobre Nós, Contacto. Quando um utilizador perguntar algo relacionado, responda em 1-2 frases e TERMINE com um de: {"redirect":"how"} ou {"redirect":"plans"} ou {"redirect":"about"} ou {"redirect":"contact"} ou {"redirect":"home"}. Preços vai para plans. Funcionalidades para how. Empresa para about. Demo/inscrição para contact. Se não relacionado, recuse educadamente sem redirecionar. Responda em português europeu (Portugal)..'
+};
+var PAGE_LABELS={
+  en:{home:'Home',how:'How It Works',plans:'Pricing',about:'About Us',contact:'Contact Us'},
+  pt:{home:'Inicio',how:'Como Funciona',plans:'Precos',about:'Sobre Nos',contact:'Contacto'}
+};
+async function sendChat(){
+  var input=document.getElementById('chatInput');
+  var btn=document.getElementById('chatSendBtn');
+  var msg=input.value.trim();
+  if(!msg)return;
+  input.value='';btn.disabled=true;
+  appendMessage('user',msg,null);
+  chatHistory.push({role:'user',content:msg});
+  document.getElementById('chatTyping').style.display='flex';
+  scrollChat();
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:SYSTEM_PROMPTS[currentLang]||SYSTEM_PROMPTS.en,messages:chatHistory})
+    });
+    var data=await res.json();
+    var raw=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:"I'm having trouble right now. Please contact us directly.";
+    var jm=raw.match(/\{"redirect"\s*:\s*"(\w+)"\}/);
+    var rp=jm?jm[1]:null;
+    var ct=raw.replace(/\{"redirect"\s*:\s*"\w+"\}/,'').trim();
+    chatHistory.push({role:'assistant',content:raw});
+    document.getElementById('chatTyping').style.display='none';
+    appendMessage('ai',ct,rp);
+  }catch(e){
+    document.getElementById('chatTyping').style.display='none';
+    appendMessage('ai',currentLang==='pt'?"Estou com dificuldades agora. Por favor contacte-nos directamente.":"Having trouble right now. Please contact us directly.",null);
+  }
+  btn.disabled=false;scrollChat();
+}
+function appendMessage(role,text,rp){
+  var c=document.getElementById('chatMessages');
+  var b=document.createElement('div');
+  b.className='chat-bubble chat-bubble--'+role;
+  var ic=document.createElement('div');ic.className='chat-bubble__icon';ic.textContent=role==='ai'?'F':'U';
+  var md=document.createElement('div');md.className='chat-bubble__msg';md.textContent=text;
+  if(rp&&PAGE_LABELS[currentLang]&&PAGE_LABELS[currentLang][rp]){
+    var lb=document.createElement('button');
+    lb.className='chat-bubble__link';
+    lb.innerHTML='Go to '+PAGE_LABELS[currentLang][rp]+' \u2192';
+    (function(p){lb.onclick=function(){navigate(p);};})(rp);
+    md.appendChild(document.createElement('br'));
+    md.appendChild(lb);
+  }
+  b.appendChild(ic);b.appendChild(md);c.appendChild(b);scrollChat();
+}
+function scrollChat(){var c=document.getElementById('chatMessages');c.scrollTop=c.scrollHeight;}
+
+/* ════════════════════════════════════════════
+   TRANSLATION SYSTEM
+════════════════════════════════════════════ */
+var currentLang='en';
+
+var TR={
+  pt:{
+    /* NAV */
+    'nav-home':'In\u00edcio','nav-how':'Como Funciona','nav-plans':'Pre\u00e7os',
+    'nav-about':'Sobre N\u00f3s','nav-contact':'Contacto',
+    /* HERO */
+    'hero-badge':'Desenvolvido com GenAI \u00b7 Feito para Portugal',
+    'hero-h1':['A FarmaGest AI simplifica a gest\u00e3o da sua farm\u00e1cia. Sem ruturas de stock e sem <em>datas de validade expiradas!</em>',true],
+    'hero-sub':'A FarmaGest AI automatiza o invent\u00e1rio, os registos de doentes e os relat\u00f3rios financeiros para farm\u00e1cias independentes portuguesas.',
+    'hero-btn1':'Iniciar Per\u00edodo Gratuito \u2192',
+    'hero-btn2':'Ver Como Funciona',
+    'stat1':'Gestores sem tempo para controlo de stock',
+    'stat2':'Doentes usam incorretamente medica\u00e7\u00e3o prescrita',
+    'stat3':'Ferramenta \u00fanica para gest\u00e3o completa',
+    'chat-title':'Assistente FarmaGest AI',
+    'chat-status':'Online \u00b7 Desenvolvido com IA',
+    'chat-thinking':'A pensar\u2026',
+    'chat-welcome':'Ol\u00e1! Sou o assistente FarmaGest AI. Como podemos ajudar a sua farm\u00e1cia hoje?',
+    /* HOME FEATURES */
+    'feat-tag':'Funcionalidades da Plataforma',
+    'feat-h2':['Tudo o que precisa,<br/>numa s\u00f3 plataforma',true],
+    'feat-p':'Desde alertas de validade a relat\u00f3rios financeiros com IA \u2014 a FarmaGest AI elimina tarefas manuais.',
+    'fc1-h':'Controlo de Invent\u00e1rio Inteligente',
+    'fc1-p':'Monitoriza\u00e7\u00e3o de stock em tempo real com alertas por IA antes de ruturas. Sugest\u00f5es de reabastecimento autom\u00e1tico.',
+    'fc2-h':'Gest\u00e3o de Datas de Validade',
+    'fc2-p':'Verifica\u00e7\u00e3o autom\u00e1tica de datas de validade. Alertas com semanas de antecedncia, evitando desperd\u00edcio.',
+    'fc3-h':'Central de Registos de Doentes',
+    'fc3-p':'Registos digitais centralizados para cada doente. Monitoriza a ades\u00e3o \u00e0 medica\u00e7\u00e3o e identifica doentes em risco.',
+    'fc4-h':'Relat\u00f3rios Financeiros com IA',
+    'fc4-p':'Gera automaticamente resumos de resultados, previs\u00f5es de receitas e an\u00e1lises de custos. Atualizado em tempo real.',
+    'fc5-h':'Previs\u00e3o de Procura',
+    'fc5-p':'Modelos de aprendizagem autom\u00e1tica treinados com o hist\u00f3rial de vendas para prever medicamentos necess\u00e1rios.',
+    'fc6-h':'Automa\u00e7\u00e3o Imediata',
+    'fc6-p':'Conecte com o seu POS e base de dados de prescri\u00e7\u00f5es. A FarmaGest AI processa dados automaticamente.',
+    /* HOME STEPS */
+    'steps-tag':'Como Funciona',
+    'steps-h2':'Operacional em 3 passos simples',
+    'steps-p':'N\u00e3o \u00e9 necess\u00e1ria equipa de TI. A maioria das farm\u00e1cias est\u00e1 operacional numa tarde.',
+    's1-h':'Conecte os seus sistemas',
+    's1-p':'A FarmaGest AI integra-se com o seu POS, base de dados de prescri\u00e7\u00f5es e ferramentas de gest\u00e3o. A configura\u00e7\u00e3o \u00e9 autom\u00e1tica em menos de 30 minutos.',
+    's2-h':'A IA analisa os seus dados',
+    's2-p':'O motor de IA processa registos hist\u00f3ricos, movimentos de stock e informa\u00e7\u00f5es de doentes para criar um quadro completo da sua farm\u00e1cia.',
+    's3-h':'Gerir com um \u00fanico painel',
+    's3-p':'Numa interface limpa: controla o invent\u00e1rio, rev\u00ea registos de doentes, l\u00ea relat\u00f3rios financeiros e recebe alertas proativos.',
+    'steps-btn':'Explorar Todas as Funcionalidades \u2192',
+    /* HOME TESTIMONIALS */
+    /* HOME CTA */
+    'cta-home-h':'Comece a transformar a sua farm\u00e1cia hoje',
+    'cta-home-p':'Uma solu\u00e7\u00e3o de gest\u00e3o mais inteligente e automatizada para as farm\u00e1cias portuguesas.',
+    'cta-home-btn':'Ver Pre\u00e7os \u2192',
+    /* HOW IT WORKS */
+    'hiw-tag':'An\u00e1lise Aprofundada da Plataforma',
+    'hiw-h1':['Uma ferramenta.<br/><em>Todas as necessidades cobertas.</em>',true],
+    'hiw-p':'Descubra como os quatro m\u00f3dulos principais da FarmaGest AI automatizam cada \u00e1rea da sua farm\u00e1cia.',
+    'm1-tag':'M\u00f3dulo 01','m1-h':'Controlo Inteligente de Invent\u00e1rio e Stock',
+    'm1-p1':'Nunca mais enfrente uma prateleira vazia. A FarmaGest AI monitoriza continuamente os n\u00edveis de stock em tempo real e usa IA para prever quando cada produto vai esgotar \u2014 antes que isso aconte\u00e7a.',
+    'm1-p2':'O sistema compara o stock atual com a procura prevista e sinaliza automaticamente os produtos que precisam de ser reabastecidos, tendo em conta a sazonalidade, os padr\u00f5es de procura locais e os prazos dos fornecedores.',
+    'm1-l1':'Monitoriza\u00e7\u00e3o de n\u00edveis de stock em tempo real em todas as categorias de produtos',
+    'm1-l2':'Sugest\u00f5es de reabastecimento com base no hist\u00f3rial de procura',
+    'm1-l3':'Verifica\u00e7\u00e3o de datas de validade com alertas com v\u00e1rias semanas de antecedncia',
+    'm1-l4':'Rastreabilidade de lotes para conformidade regulat\u00f3ria',
+    'm1-l5':'Integra\u00e7\u00e3o autom\u00e1tica de encomendas a fornecedores',
+    'm2-tag':'M\u00f3dulo 02','m2-h':'Gest\u00e3o de Datas de Validade e Conformidade',
+    'm2-p1':'Produtos com validade expirada na prateleira constituem um risco de conformidade, uma perda de receita e um perigo para a seguran\u00e7a. A FarmaGest AI elimina este problema com rastreamento autom\u00e1tico incorporado no fluxo di\u00e1rio de trabalho.',
+    'm2-p2':'Receba alertas escalonados \u2014 90, 60, 30 e 7 dias antes da validade \u2014 para ter tempo de fazer desconto, devolver ou redistribuir produtos em vez de os abater.',
+    'm2-l1':'Alertas de validade escalonados a 90, 60, 30 e 7 dias',
+    'm2-l2':'Sugest\u00f5es autom\u00e1ticas de remo\u00e7\u00e3o do stock ativo',
+    'm2-l3':'Gera\u00e7\u00e3o de documenta\u00e7\u00e3o de devolu\u00e7\u00e3o a fornecedores',
+    'm2-l4':'Relat\u00f3rios mensais de redu\u00e7\u00e3o de desperd\u00edcio',
+    'm2-l5':'Registos de conformidade compat\u00edveis com o INFARMED',
+    'm3-tag':'M\u00f3dulo 03','m3-h':'Gest\u00e3o de Registos de Doentes',
+    'm3-p1':'At\u00e9 50% dos doentes usam incorretamente a medica\u00e7\u00e3o prescrita. A FarmaGest AI ajuda a criar uma rela\u00e7\u00e3o real com cada doente \u2014 acompanhando o hist\u00f3rial de medica\u00e7\u00e3o, sinalizando problemas de ader\u00eancia e capacitando os farmac\u00eauticos para intervir no momento certo.',
+    'm3-p2':'Cada intera\u00e7\u00e3o com o doente \u00e9 automaticamente registada e analisada, criando um perfil de sa\u00fade longitudinal que torna poss\u00edvel os cuidados personalizados sem trabalho manual adicional.',
+    'm3-l1':'Perfis digitais centralizados para cada doente',
+    'm3-l2':'Acompanhamento e alertas de ader\u00eancia \u00e0 medica\u00e7\u00e3o',
+    'm3-l3':'Alertas de intera\u00e7\u00f5es e contraindica\u00e7\u00f5es',
+    'm3-l4':'Pain\u00e9is de monitoriza\u00e7\u00e3o de doen\u00e7as cr\u00f3nicas',
+    'm3-l5':'Armazenamento de dados e controlo de acesso conformes com o RGPD',
+    'm4-tag':'M\u00f3dulo 04','m4-h':'An\u00e1lise Financeira com IA',
+    'm4-p1':'A FarmaGest AI processa automaticamente cada venda, devolu\u00e7\u00e3o e compra para gerar informa\u00e7\u00e3o financeira clara e acion\u00e1vel \u2014 desde o fluxo de caixa di\u00e1rio at\u00e9 aos relat\u00f3rios trimestrais \u2014 sem qualquer interven\u00e7\u00e3o manual.',
+    'm4-p2':'A IA aprende os padr\u00f5es da farm\u00e1cia e fornece previs\u00f5es orientadas para o futuro, ajudando a tomar decis\u00f5es de compra mais inteligentes.',
+    'm4-l1':'Relat\u00f3rios de receita di\u00e1rios, semanais e mensais automatizados',
+    'm4-l2':'An\u00e1lise de margem por categoria de produto',
+    'm4-l3':'Previs\u00f5es de receita geradas por IA com intervalos de confian\u00e7a',
+    'm4-l4':'M\u00e9tricas de custo por prescri\u00e7\u00e3o e rentabilidade',
+    'm4-l5':'Relat\u00f3rios prontos a exportar para contabilistas e declara\u00e7\u00f5es fiscais',
+    'cta-how-h':'Pronto para automatizar a sua farm\u00e1cia?',
+    'cta-how-p':'Sem ruturas de stock e sem datas de validade expiradas. A forma mais inteligente de gerir a sua farm\u00e1cia.',
+    'cta-how-btn':'Ver Pre\u00e7os \u2192',
+    /* PRICING */
+    'plans-tag':'Pre\u00e7os Transparentes',
+    'plans-h1':['Pre\u00e7os simples<br/>e <em>honestos</em>',true],
+    'plans-p':'Escolha a op\u00e7\u00e3o que melhor se adequa \u00e0s necessidades da sua farm\u00e1cia.',
+    'p1-name':'Standard',
+    'p1-h3':'Automa\u00e7\u00e3o completa para a sua farm\u00e1cia independente.',
+    'p1-tag':'Tudo o que precisa para eliminar o trabalho manual.',
+    'p1-period':'por m\u00eas \u00b7 cancele a qualquer momento \u00b7 14 dias gratuitos',
+    'p1f1':'Controlo inteligente de invent\u00e1rio e stock',
+    'p1f2':'Alertas de validade (90 / 60 / 30 / 7 dias)',
+    'p1f3':'Registos de doentes ilimitados',
+    'p1f4':'Relat\u00f3rios financeiros gerados por IA',
+    'p1f5':'Motor de previs\u00e3o de procura',
+    'p1f6':'Integra\u00e7\u00e3o com POS e base de dados de prescri\u00e7\u00f5es',
+    'p1f7':'Exporta\u00e7\u00e3o de conformidade INFARMED',
+    'p1f8':'At\u00e9 5 contas de utilizador',
+    'p1f9':'Suporte priorit\u00e1rio por e-mail e chat',
+    'p1-btn':'Iniciar Per\u00edodo Gratuito \u2192',
+    'p2-badge':'Para Farm\u00e1cias de Maior Dimens\u00e3o',
+    'p2-name':'Enterprise',
+    'p2-h3':'Solu\u00e7\u00e3o personalizada para grupos de farm\u00e1cias.',
+    'p2-tag':'Gest\u00e3o centralizada, suporte dedicado e integra\u00e7\u00f5es personalizadas.',
+    'p2-amount':'Personalizado',
+    'p2-period':'pre\u00e7os adaptados \u00e0s suas necessidades',
+    'p2f1':'Tudo o que est\u00e1 no Standard',
+    'p2f2':'Locais ilimitados',
+    'p2f3':'Contas de utilizador ilimitadas',
+    'p2f4':'An\u00e1lise e relat\u00f3rios entre locais',
+    'p2f5':'Integra\u00e7\u00f5es API personalizadas',
+    'p2f6':'Gestor de conta dedicado',
+    'p2f7':'Integra\u00e7\u00e3o e forma\u00e7\u00e3o no local',
+    'p2f8':'Contrato e fatura\u00e7\u00e3o personalizados',
+    'p2-btn':'Contacte-nos \u2192',
+    'faq-tag':'FAQ',
+    'faq-h2':'Perguntas frequentes sobre pre\u00e7os',
+    'faq1-q':'Posso cancelar a qualquer momento?',
+    'faq1-a':'Sim. A FarmaGest AI funciona com subscri\u00e7\u00e3o mensal e pode cancelar a qualquer momento sem penaliza\u00e7\u00e3o.',
+    'faq2-q':'Quanto tempo demora a configura\u00e7\u00e3o?',
+    'faq2-a':'A maioria das farm\u00e1cias est\u00e1 completamente configurada numa tarde. O assistente guia por cada passo.',
+    'faq3-q':'Existe per\u00edodo gratuito para o plano Standard?',
+    'faq3-a':'Sim \u2014 14 dias completamente gratuitos, sem cart\u00e3o de cr\u00e9dito. Experimente antes de se comprometer.',
+    'faq4-q':'Os dados dos meus doentes est\u00e3o seguros?',
+    'faq4-a':'Todos os dados s\u00e3o encriptados e alojados em servidores da UE, totalmente conformes com o RGPD.',
+    'cta-plans-h':'N\u00e3o sabe qual a op\u00e7\u00e3o certa para si?',
+    'cta-plans-p':'Fale com a equipa e ser\u00e1 recomendada a melhor op\u00e7\u00e3o para a sua farm\u00e1cia.',
+    'cta-plans-btn':'Fale Connosco \u2192',
+    /* ABOUT */
+    'about-tag':'A Nossa Hist\u00f3ria',
+    'about-h1':['Criado por pessoas<br/>que conhecem os<br/><em>desafios das farm\u00e1cias.</em>',true],
+    'about-hero-p':'A FarmaGest AI nasceu de uma frustra\u00e7\u00e3o simples: as ferramentas dispon\u00edveis para as 2.900 farm\u00e1cias independentes de Portugal eram desatualizadas e exigiam demasiado esfor\u00e7o manual.',
+    'about-mission-title':'A Nossa Miss\u00e3o',
+    'about-founded':'Fundada',
+    'about-country':'Portugal em primeiro',
+    'prob-tag':'O Problema que Resolvemos',
+    'prob-h2':'As farm\u00e1cias portuguesas t\u00eam sido desservidas h\u00e1 demasiado tempo',
+    'prob-p1':'Investiga\u00e7\u00e3o da Universidade Lus\u00f3fona revelou que 36% dos gestores de farm\u00e1cias sabem que precisam de melhor gest\u00e3o de stock mas n\u00e3o t\u00eam tempo. A Ordem dos Farm\u00e2ceuticos estima que at\u00e9 50% dos doentes usam incorretamente a medica\u00e7\u00e3o prescrita.',
+    'prob-p2':'N\u00e3o s\u00e3o apenas n\u00fameros. Representam receitas perdidas, medicamentos desperdi\u00e7ados e doentes em risco. A FarmaGest AI foi criada para colmatar esta lacuna.',
+    'prob-p3':'A IA n\u00e3o se limita a reportar o que aconteceu. Diz o que est\u00e1 prestes a acontecer e o que deve ser feito.',
+    'val-tag':'Os Nossos Valores',
+    'val-h2':'O que nos motiva todos os dias',
+    'v1-h':'Precis\u00e3o','v1-p':'Cada alerta, relat\u00f3rio e previs\u00e3o gerados devem ser acion\u00e1veis e confi\u00e1veis.',
+    'v2-h':'Doente em Primeiro','v2-p':'O objetivo final de cada funcionalidade \u00e9 uma comunidade de doentes mais saud\u00e1vel.',
+    'v3-h':'Ra\u00edzez Locais','v3-p':'Criado em Portugal, para Portugal. Regulamenta\u00e7\u00e3o local e realidades do mercado bem compreendidas.',
+    'v4-h':'Privacidade','v4-p':'Os dados dos doentes s\u00e3o sagrados. Conformidade com o RGPD incorporada por design.',
+    'cta-about-h':'Junte-se ao movimento FarmaGest AI',
+    'cta-about-p':'Promova uma comunidade de doentes mais saud\u00e1vel, acompanhando a sa\u00fade deles e as finan\u00e7as da sua farm\u00e1cia.',
+    'cta-about-btn':'Entrar em Contacto \u2192',
+    /* CONTACT */
+    'con-tag':'Entre em Contacto',
+    'con-h1':['Vamos falar sobre<br/>a sua farm\u00e1cia',true],
+    'con-sub':'Compreender as suas necessidades e mostrar como a FarmaGest AI pode ajudar \u00e9 o objetivo.',
+    'con-info-h':'Aqui para ajudar a sua farm\u00e1cia a crescer',
+    'con-info-p':'Seja um gestor de farm\u00e1cia independente ou um grupo \u00e0 procura de uma solu\u00e7\u00e3o empresarial \u2014 a op\u00e7\u00e3o certa ser\u00e1 encontrada.',
+    'con-office-lbl':'Escrit\u00f3rio',
+    'con-email-lbl':'E-mail',
+    'con-phone-lbl':'Telefone',
+    'con-hours-lbl':'Hor\u00e1rio',
+    'con-hours-val':'Segunda \u2013 Sexta, 9:00 \u2013 18:00 (hora de Lisboa)',
+    'form-title':'Envie-nos uma mensagem',
+    'form-sub':'Respondemos normalmente dentro de um dia \u00fatil.',
+    'lbl-fname':'Nome *','lbl-lname':'Apelido *','lbl-email':'E-mail *',
+    'lbl-pharmacy':'Nome da Farm\u00e1cia','lbl-interest':'Tenho interesse em','lbl-msg':'Mensagem',
+    'form-submit-btn':'Enviar Mensagem \u2192',
+    'success-h':'Mensagem recebida!',
+    'success-p':'Obrigado pelo contacto. Um membro da equipa entrar\u00e1 em contacto dentro de um dia \u00fatil.',
+    /* FOOTER */
+    'foot-col-product':'Produto','foot-col-company':'Empresa','foot-col-legal':'Legal',
+    'foot-link-how':'Como Funciona','foot-link-plans':'Pre\u00e7os',
+    'foot-link-about':'Sobre N\u00f3s','foot-link-contact':'Contacto',
+    'foot-link-privacy':'Pol\u00edtica de Privacidade','foot-link-terms':'Termos de Servi\u00e7o','foot-link-gdpr':'RGPD',
+    'foot-copy':'\u00a9 2025 FarmaGest AI. Todos os direitos reservados. Feito em Portugal \uD83C\uDDF5\uD83C\uDDF9'
+  }
+};
+
+/* Build EN cache from DOM on first translate */
+var enCache={};
+
+function cacheEN(id,isHTML){
+  if(enCache[id]!==undefined)return;
+  var el=document.getElementById(id);
+  if(!el)return;
+  enCache[id]=isHTML?el.innerHTML:el.textContent;
+}
+function cacheENClass(cls,isHTML){
+  if(enCache[cls]!==undefined)return;
+  var els=document.querySelectorAll('.'+cls);
+  if(!els.length)return;
+  enCache[cls]=Array.from(els).map(function(e){return isHTML?e.innerHTML:e.textContent;});
+}
+
+function applyLang(lang){
+  var dict=TR.pt;
+  Object.keys(dict).forEach(function(key){
+    var val=dict[key];
+    var isHTML=Array.isArray(val)&&val[1]===true;
+    var text=isHTML?val[0]:val;
+    if(lang==='pt'){
+      /* cache EN first */
+      cacheEN(key,isHTML);
+      cacheENClass(key,isHTML);
+      /* apply to ID */
+      var el=document.getElementById(key);
+      if(el){if(isHTML)el.innerHTML=text;else el.textContent=text;}
+      /* apply to all elements with this class */
+      document.querySelectorAll('.'+key).forEach(function(e){
+        if(isHTML)e.innerHTML=text;else e.textContent=text;
+      });
+    } else {
+      /* restore EN */
+      var cached=enCache[key];
+      if(cached!==undefined){
+        var el2=document.getElementById(key);
+        if(el2){if(isHTML)el2.innerHTML=cached;else el2.textContent=cached;}
+      }
+      /* restore class-based */
+      var cachedArr=enCache['.'+key]||enCache[key];
+      if(Array.isArray(cachedArr)){
+        document.querySelectorAll('.'+key).forEach(function(e,i){
+          if(cachedArr[i]!==undefined){if(isHTML)e.innerHTML=cachedArr[i];else e.textContent=cachedArr[i];}
+        });
+      }
+    }
+  });
+  /* Select options */
+  var fint=document.getElementById('f-interest');
+  if(fint){
+    if(lang==='pt'){
+      var ptOpts=['Plano Standard (\u20ac49/m\u00eas)','Enterprise (Personalizado)','Informa\u00e7\u00f5es Gerais','Suporte T\u00e9cnico'];
+      if(!enCache['f-interest-opts'])enCache['f-interest-opts']=Array.from(fint.options).map(function(o){return o.text;});
+      Array.from(fint.options).forEach(function(o,i){if(ptOpts[i])o.text=ptOpts[i];});
+    } else if(enCache['f-interest-opts']){
+      Array.from(fint.options).forEach(function(o,i){if(enCache['f-interest-opts'][i])o.text=enCache['f-interest-opts'][i];});
+    }
+  }
+  /* Chatbot placeholder */
+  var ci=document.getElementById('chatInput');
+  if(ci)ci.placeholder=lang==='pt'?'Pergunte sobre stock, doentes, pre\u00e7os\u2026':'Ask about stock, patients, pricing\u2026';
+  var fm=document.getElementById('f-msg');
+  if(fm)fm.placeholder=lang==='pt'?'Conte-nos sobre a sua farm\u00e1cia e o que pretende alcan\u00e7ar\u2026':'Tell us about your pharmacy and what you are looking to achieve...';
+  /* Footer taglines (not IDs, just class) */
+  document.querySelectorAll('.footer__tagline').forEach(function(e){
+    if(lang==='pt')e.textContent='Automatize a gest\u00e3o da sua farm\u00e1cia com tecnologia de IA.';
+    else e.textContent="Automate your pharmacy's management.";
+  });
+  /* Legal notices */
+  ['privacy','terms','gdpr'].forEach(function(p){
+    var n=document.getElementById('legal-note-'+p);
+    if(n)n.style.display=lang==='pt'?'block':'none';
+  });
+  /* Toggle button states */
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.classList.toggle('active',b.dataset.lang===lang);
+  });
+}
+
+function setLanguage(lang){
+  currentLang=lang;
+  applyLang(lang);
+  try{localStorage.setItem('fg-lang',lang);}catch(e){}
+}
+
+/* Init */
+navigate('home');
+(function(){
+  try{
+    var saved=localStorage.getItem('fg-lang');
+    if(saved==='pt'){currentLang='pt';setTimeout(function(){applyLang('pt');},80);}
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
