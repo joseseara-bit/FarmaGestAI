@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PharmAI — Pharmacy Management, Powered by AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================
+   CSS VARIABLES & RESET
+============================================ */
+:root {
+  --navy:      #071E3D;
+  --teal:      #00695C;
+  --teal-light:#00897B;
+  --mint:      #E0F2EE;
+  --mint-soft: #F0FAF8;
+  --cream:     #F8F6F0;
+  --white:     #FFFFFF;
+  --gold:      #C8A96E;
+  --gold-light:#F0E4C8;
+  --text:      #1A2B3C;
+  --text-mid:  #4A5C6B;
+  --text-soft: #8A9BAA;
+  --border:    #DDE8E6;
+  --shadow:    rgba(7,30,61,0.12);
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans:  'Outfit', sans-serif;
+  --radius:     12px;
+  --radius-lg:  24px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--white);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: var(--font-sans); }
+
+/* ============================================
+   UTILITIES
+============================================ */
+.page { display: none; animation: fadeUp 0.5s ease forwards; }
+.page.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.container--narrow { max-width: 820px; margin: 0 auto; padding: 0 32px; }
+
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: var(--mint);
+  padding: 5px 14px;
+  border-radius: 100px;
+}
+
+.section { padding: 96px 0; }
+.section--alt { background: var(--mint-soft); }
+.section--dark { background: var(--navy); color: var(--white); }
+.section--cream { background: var(--cream); }
+
+.section-header { text-align: center; margin-bottom: 64px; }
+.section-header .tag { margin-bottom: 16px; }
+.section-header h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+.section--dark .section-header h2 { color: var(--white); }
+.section-header p {
+  font-size: 17px;
+  color: var(--text-mid);
+  max-width: 560px;
+  margin: 0 auto;
+  font-weight: 300;
+}
+.section--dark .section-header p { color: rgba(255,255,255,0.65); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.btn--primary {
+  background: var(--teal);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(0,105,92,0.3);
+}
+.btn--primary:hover {
+  background: var(--teal-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,105,92,0.35);
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--navy);
+  border: 1.5px solid var(--border);
+}
+.btn--secondary:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  transform: translateY(-2px);
+}
+
+.btn--ghost {
+  background: rgba(255,255,255,0.1);
+  color: var(--white);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(8px);
+}
+.btn--ghost:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   NAVIGATION
+============================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 999;
+  padding: 18px 0;
+  transition: all 0.3s ease;
+}
+.nav.scrolled {
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1px 32px rgba(7,30,61,0.08);
+  padding: 14px 0;
+}
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.nav__logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+.nav__logo-text {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--navy);
+}
+.nav__logo-text span { color: var(--teal); font-style: italic; }
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+}
+.nav__links li a, .nav__links li button {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-mid);
+  padding: 8px 16px;
+  border-radius: 100px;
+  transition: all 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.nav__links li a:hover, .nav__links li button:hover,
+.nav__links li a.active, .nav__links li button.active {
+  color: var(--teal);
+  background: var(--mint);
+}
+.nav__cta {
+  background: var(--navy) !important;
+  color: white !important;
+  border-radius: 100px !important;
+  padding: 10px 22px !important;
+}
+.nav__cta:hover {
+  background: var(--teal) !important;
+}
+
+/* ============================================
+   HOME PAGE — HERO
+============================================ */
+.hero {
+  min-height: 100vh;
+  background: var(--navy);
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-top: 80px;
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero__bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+}
+.hero__bg-circle--1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, #00897B 0%, transparent 70%);
+  top: -100px; right: -100px;
+}
+.hero__bg-circle--2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #C8A96E 0%, transparent 70%);
+  bottom: -50px; left: 10%;
+  opacity: 0.15;
+}
+.hero__grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,137,123,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,137,123,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  padding: 80px 0;
+}
+.hero__content {}
+.hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.hero__eyebrow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,137,123,0.2);
+  border: 1px solid rgba(0,137,123,0.4);
+  color: #4DD0C4;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 5px 14px;
+  border-radius: 100px;
+}
+.hero__eyebrow-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #4DD0C4;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1.12;
+  margin-bottom: 24px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: #4DD0C4;
+}
+.hero h1 strong {
+  font-weight: 400;
+  color: var(--gold);
+}
+
+.hero__sub {
+  font-size: 18px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 300;
+  max-width: 440px;
+  margin-bottom: 40px;
+  line-height: 1.7;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 56px;
+}
+
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 32px;
+}
+.hero__stat {
+  padding: 0 20px 0 0;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+.hero__stat:first-child { padding-left: 0; }
+.hero__stat:last-child { border-right: none; }
+.hero__stat-num {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.hero__stat-num span { color: var(--gold); }
+.hero__stat-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================
+   CHATBOT — HERO RIGHT PANEL
+============================================ */
+.hero__chat-wrapper {
+  position: relative;
+}
+.hero__chat-glow {
+  position: absolute;
+  inset: -30px;
+  background: radial-gradient(ellipse at center, rgba(0,137,123,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.chat-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 32px;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+.chat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(77,208,196,0.6), transparent);
+}
+.chat-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.chat-card__avatar {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.chat-card__info h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+.chat-card__info p {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.chat-card__info p::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #4ade80;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.chat-messages {
+  min-height: 220px;
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.chat-bubble {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: fadeUp 0.3s ease forwards;
+}
+.chat-bubble--user { flex-direction: row-reverse; }
+
+.chat-bubble__icon {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.chat-bubble--ai .chat-bubble__icon {
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+}
+.chat-bubble--user .chat-bubble__icon {
+  background: rgba(255,255,255,0.15);
+}
+
+.chat-bubble__msg {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.chat-bubble--ai .chat-bubble__msg {
+  background: rgba(0,137,123,0.18);
+  border: 1px solid rgba(0,137,123,0.3);
+  color: rgba(255,255,255,0.92);
+  border-top-left-radius: 4px;
+}
+.chat-bubble--user .chat-bubble__msg {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.85);
+  border-top-right-radius: 4px;
+}
+
+.chat-bubble__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  background: var(--teal);
+  color: white;
+  padding: 7px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-sans);
+  transition: all 0.2s;
+}
+.chat-bubble__link:hover {
+  background: var(--teal-light);
+  transform: translateX(3px);
+}
+
+.chat-typing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+}
+.chat-typing__dots {
+  display: flex;
+  gap: 4px;
+}
+.chat-typing__dots span {
+  width: 5px; height: 5px;
+  background: var(--teal-light);
+  border-radius: 50%;
+  animation: typingDot 1.2s infinite;
+  display: block;
+}
+.chat-typing__dots span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing__dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%,60%,100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.chat-input-area input {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 13px 18px;
+  color: white;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.chat-input-area input::placeholder { color: rgba(255,255,255,0.3); }
+.chat-input-area input:focus { border-color: rgba(0,137,123,0.6); }
+
+.chat-send-btn {
+  width: 44px; height: 44px;
+  background: var(--teal);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.chat-send-btn:hover { background: var(--teal-light); transform: scale(1.05); }
+.chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ============================================
+   FEATURES SECTION
+============================================ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.feature-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--teal), var(--teal-light));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.feature-card:hover {
+  box-shadow: 0 12px 48px rgba(7,30,61,0.1);
+  transform: translateY(-4px);
+  border-color: var(--teal);
+}
+.feature-card:hover::before { transform: scaleX(1); }
+.feature-card__icon {
+  width: 54px; height: 54px;
+  background: var(--mint);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 22px;
+}
+.feature-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+.feature-card p {
+  font-size: 15px;
+  color: var(--text-mid);
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+/* ============================================
+   SOCIAL PROOF / STATS BAND
+============================================ */
+.stats-band {
+  background: var(--navy);
+  padding: 72px 0;
+}
+.stats-band__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  text-align: center;
+}
+.stats-band__item {}
+.stats-band__num {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stats-band__num em {
+  font-style: italic;
+  color: var(--gold);
+}
+.stats-band__label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+
+/* ============================================
+   HOW IT WORKS PREVIEW
+============================================ */
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.step-item {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 28px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.step-item:last-child { border-bottom: none; }
+.step-item__number {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--mint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--teal);
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.step-item:hover .step-item__number {
+  background: var(--teal);
+  color: white;
+}
+.step-item__content {}
+.step-item h3 {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+.step-item p {
+  font-size: 15px;
+  color: var(--text-mid);
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+/* ============================================
+   TESTIMONIALS
+============================================ */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.testimonial-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  transition: all 0.3s;
+}
+.testimonial-card:hover {
+  background: rgba(255,255,255,0.09);
+  transform: translateY(-4px);
+}
+.testimonial-card__quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 17px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+.testimonial-card__quote::before {
+  content: '"';
+  font-size: 3rem;
+  color: var(--teal-light);
+  line-height: 0;
+  vertical-align: -0.7em;
+  margin-right: 4px;
+  font-family: var(--font-serif);
+}
+.testimonial-card__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.testimonial-card__avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--gold) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+.testimonial-card__meta strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 2px;
+}
+.testimonial-card__meta span {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ============================================
+   CTA SECTION
+============================================ */
+.cta-section {
+  background: linear-gradient(135deg, var(--teal) 0%, #00524A 100%);
+  padding: 96px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  top: -200px; right: -100px;
+  pointer-events: none;
+}
+.cta-section h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 300;
+  color: white;
+  margin-bottom: 16px;
+  line-height: 1.2;
+  position: relative;
+}
+.cta-section p {
+  font-size: 17px;
+  color: rgba(255,255,255,0.7);
+  max-width: 480px;
+  margin: 0 auto 40px;
+  font-weight: 300;
+  position: relative;
+}
+.cta-section .btn--ghost {
+  position: relative;
+  font-size: 16px;
+  padding: 16px 36px;
+}
+
+/* ============================================
+   HOW IT WORKS PAGE
+============================================ */
+.hiw-hero {
+  background: var(--navy);
+  padding: 160px 0 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hiw-hero::before {
+  content: '';
+  position: absolute;
+  width: 800px; height: 400px;
+  background: radial-gradient(ellipse, rgba(0,137,123,0.2) 0%, transparent 70%);
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.hiw-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
+  color: white;
+  margin-bottom: 16px;
+  position: relative;
+}
+.hiw-hero h1 em { color: #4DD0C4; font-style: italic; }
+.hiw-hero p {
+  font-size: 18px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 300;
+  max-width: 560px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.features-deep {
+  padding: 100px 0;
+}
+.feature-deep-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  margin-bottom: 100px;
+  padding-bottom: 100px;
+  border-bottom: 1px solid var(--border);
+}
+.feature-deep-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.feature-deep-item:nth-child(even) { direction: rtl; }
+.feature-deep-item:nth-child(even) > * { direction: ltr; }
+.feature-deep-item__text {}
+.feature-deep-item__text .tag { margin-bottom: 16px; }
+.feature-deep-item__text h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 300;
+  color: var(--navy);
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+.feature-deep-item__text p {
+  font-size: 16px;
+  color: var(--text-mid);
+  font-weight: 300;
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+.feature-deep-item__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.feature-deep-item__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--text-mid);
+}
+.feature-deep-item__list li::before {
+  content: '✓';
+  width: 22px; height: 22px;
+  background: var(--mint);
+  color: var(--teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.feature-deep-item__visual {
+  background: linear-gradient(135deg, var(--mint) 0%, var(--mint-soft) 100%);
+  border-radius: 24px;
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.feature-visual-inner {
+  width: 100%;
+  height: 100%;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Mini dashboard mockup widgets */
+.mini-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 12px rgba(7,30,61,0.06);
+}
+.mini-card__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.mini-card__value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+}
+.mini-card__sub {
+  font-size: 12px;
+  color: var(--teal);
+  margin-top: 3px;
+  font-weight: 500;
+}
+.mini-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 3px 0;
+}
+.mini-bar-label {
+  font-size: 11px;
+  color: var(--text-mid);
+  width: 80px;
+  flex-shrink: 0;
+}
+.mini-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.mini-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--teal-light));
+  border-radius: 100px;
+}
+.mini-bar-pct {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  width: 28px;
+  text-align: right;
+}
+.mini-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.mini-alert--warn {
+  background: #FFF8E8;
+  border: 1px solid #F0C060;
+  color: #7A5800;
+}
+.mini-alert--ok {
+  background: var(--mint);
+  border: 1px solid var(--teal);
+  color: var(--teal);
+}
+.mini-alert--icon { font-size: 16px; }
+.mini-chart-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 50px;
+  padding: 0 4px;
+}
+.mini-bar-chart {
+  flex: 1;
+  background: var(--mint);
+  border-radius: 4px 4px 0 0;
+  transition: background 0.3s;
+}
+.mini-bar-chart:hover { background: var(--teal); }
+.mini-tag-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mini-tag {
+  background: var(--mint);
+  color: var(--teal);
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.mini-patient-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mini-patient-row:last-child { border-bottom: none; }
+.mini-patient-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--gold));
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: white;
+  font-weight: 600;
+}
+.mini-patient-info { flex: 1; }
+.mini-patient-name { font-size: 12px; font-weight: 600; color: var(--navy); line-height: 1; }
+.mini-patient-med { font-size: 10px; color: var(--text-soft); margin-top: 2px; }
+.mini-patient-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+.mini-patient-badge--ok { background: var(--mint); color: var(--teal); }
+.mini-patient-badge--warn { background: #FFF3CD; color: #856404; }
+
+/* ============================================
+   PLANS PAGE
+============================================ */
+.plans-hero {
+  background: var(--navy);
+  padding: 160px 0 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.plans-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,137,123,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,137,123,0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.plans-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
+  color: white;
+  margin-bottom: 16px;
+  position: relative;
+}
+.plans-hero h1 em { color: #4DD0C4; font-style: italic; }
+.plans-hero p {
+  font-size: 18px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 300;
+  max-width: 520px;
+  margin: 0 auto 32px;
+  position: relative;
+}
+
+.billing-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 100px;
+  padding: 6px 16px;
+  position: relative;
+}
+.billing-toggle span {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px 0;
+}
+.billing-toggle span.active { color: white; font-weight: 600; }
+.billing-badge {
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+  letter-spacing: 0.06em;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 80px 0;
+  align-items: start;
+}
+.plan-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  position: relative;
+  transition: all 0.3s;
+}
+.plan-card:hover {
+  box-shadow: 0 16px 56px rgba(7,30,61,0.12);
+  transform: translateY(-6px);
+}
+.plan-card--featured {
+  border-color: var(--teal);
+  box-shadow: 0 16px 56px rgba(0,105,92,0.18);
+}
+.plan-card__badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--teal);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 18px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+.plan-card__name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 8px;
+}
+.plan-card h3 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+.plan-card__tagline {
+  font-size: 14px;
+  color: var(--text-mid);
+  margin-bottom: 32px;
+  font-weight: 300;
+  line-height: 1.6;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.plan-price {
+  margin-bottom: 28px;
+}
+.plan-price__amount {
+  font-family: var(--font-serif);
+  font-size: 3.5rem;
+  font-weight: 300;
+  color: var(--navy);
+  line-height: 1;
+}
+.plan-price__amount sup {
+  font-size: 1.2rem;
+  vertical-align: super;
+  color: var(--text-mid);
+}
+.plan-price__period {
+  font-size: 14px;
+  color: var(--text-mid);
+  margin-top: 4px;
+}
+.plan-price__period em {
+  font-style: normal;
+  font-size: 12px;
+  background: var(--gold-light);
+  color: var(--navy);
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+.plan-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+.plan-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-mid);
+}
+.plan-features li::before {
+  content: '✓';
+  width: 20px; height: 20px;
+  background: var(--mint);
+  color: var(--teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.plan-features li.disabled {
+  opacity: 0.4;
+}
+.plan-features li.disabled::before {
+  content: '—';
+  background: var(--border);
+  color: var(--text-soft);
+}
+.plan-card .btn {
+  width: 100%;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.plans-comparison {
+  padding: 80px 0;
+  background: var(--mint-soft);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 2px 32px rgba(7,30,61,0.06);
+}
+.comparison-table th {
+  padding: 20px 24px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--mint);
+}
+.comparison-table th:not(:first-child) { text-align: center; color: var(--teal); }
+.comparison-table td {
+  padding: 16px 24px;
+  font-size: 14px;
+  color: var(--text-mid);
+  border-bottom: 1px solid var(--border);
+}
+.comparison-table td:not(:first-child) { text-align: center; font-weight: 600; color: var(--navy); }
+.comparison-table tr:last-child td { border-bottom: none; }
+.comparison-table tr:hover td { background: rgba(0,105,92,0.02); }
+.check-icon { color: var(--teal); font-size: 18px; }
+.dash-icon { color: var(--border); }
+
+/* ============================================
+   ABOUT PAGE
+============================================ */
+.about-hero {
+  background: var(--navy);
+  padding: 160px 0 100px;
+  position: relative;
+  overflow: hidden;
+}
+.about-hero::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,137,123,0.2) 0%, transparent 70%);
+  top: -200px; right: -100px;
+}
+.about-hero__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  position: relative;
+}
+.about-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 4vw, 3.8rem);
+  font-weight: 300;
+  color: white;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+.about-hero h1 em { color: #4DD0C4; font-style: italic; }
+.about-hero p {
+  font-size: 17px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 300;
+  line-height: 1.75;
+}
+.about-hero__visual {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 36px;
+  backdrop-filter: blur(10px);
+}
+.about-mission {
+  padding: 100px 0;
+}
+.about-mission__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.about-mission h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 300;
+  color: var(--navy);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+.about-mission p {
+  font-size: 16px;
+  color: var(--text-mid);
+  font-weight: 300;
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+.about-values {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.value-card {
+  background: var(--mint-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.value-card__icon { font-size: 24px; margin-bottom: 10px; }
+.value-card h4 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+.value-card p { font-size: 13px; color: var(--text-mid); font-weight: 300; line-height: 1.55; }
+
+.team-section { padding: 80px 0; background: var(--cream); }
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.team-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.team-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(7,30,61,0.1);
+  border-color: var(--teal);
+}
+.team-card__avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+}
+.team-card h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.team-card__role {
+  font-size: 13px;
+  color: var(--teal);
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+.team-card p {
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+/* ============================================
+   CONTACT PAGE
+============================================ */
+.contact-hero {
+  background: var(--navy);
+  padding: 160px 0 80px;
+  text-align: center;
+  position: relative;
+}
+.contact-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(rgba(0,137,123,0.15) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.contact-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
+  color: white;
+  margin-bottom: 14px;
+  position: relative;
+}
+.contact-hero p {
+  font-size: 17px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 300;
+  position: relative;
+}
+
+.contact-section { padding: 96px 0; }
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 80px;
+  align-items: start;
+}
+.contact-info h2 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--navy);
+  margin-bottom: 14px;
+}
+.contact-info p {
+  font-size: 15px;
+  color: var(--text-mid);
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 36px;
+}
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.contact-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.contact-detail__icon {
+  width: 42px; height: 42px;
+  background: var(--mint);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.contact-detail strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 2px;
+}
+.contact-detail span {
+  font-size: 14px;
+  color: var(--text-mid);
+}
+
+.contact-form {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  box-shadow: 0 4px 40px rgba(7,30,61,0.06);
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--white);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0,105,92,0.1);
+}
+.form-group textarea { resize: vertical; min-height: 130px; }
+.form-submit { width: 100%; justify-content: center; font-size: 16px; padding: 16px; }
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 32px;
+}
+.form-success__icon { font-size: 48px; margin-bottom: 14px; }
+.form-success h3 { font-size: 20px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+.form-success p { color: var(--text-mid); font-size: 15px; font-weight: 300; }
+
+/* ============================================
+   FOOTER
+============================================ */
+.footer {
+  background: var(--navy);
+  padding: 72px 0 32px;
+}
+.footer__top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 60px;
+  padding-bottom: 56px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 32px;
+}
+.footer__brand {}
+.footer__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.footer__logo-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.footer__logo-text {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: white;
+}
+.footer__logo-text span { color: #4DD0C4; font-style: italic; }
+.footer__tagline {
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 240px;
+}
+.footer__col h4 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 18px;
+}
+.footer__links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.footer__links li button,
+.footer__links li a {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  font-family: var(--font-sans);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  text-align: left;
+  padding: 0;
+}
+.footer__links li button:hover,
+.footer__links li a:hover {
+  color: #4DD0C4;
+}
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer__copy {
+  font-size: 13px;
+  color: rgba(255,255,255,0.3);
+}
+.footer__legal {
+  display: flex;
+  gap: 20px;
+}
+.footer__legal a {
+  font-size: 13px;
+  color: rgba(255,255,255,0.3);
+  transition: color 0.2s;
+}
+.footer__legal a:hover { color: rgba(255,255,255,0.6); }
+
+/* ============================================
+   TOAST NOTIFICATION
+============================================ */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--navy);
+  color: white;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  border-left: 3px solid var(--teal);
+  z-index: 9999;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 900px) {
+  .hero__inner { grid-template-columns: 1fr; gap: 48px; padding: 60px 0; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .stats-band__grid { grid-template-columns: repeat(2, 1fr); }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .plans-grid { grid-template-columns: 1fr; }
+  .feature-deep-item { grid-template-columns: 1fr; gap: 40px; }
+  .feature-deep-item:nth-child(even) { direction: ltr; }
+  .about-hero__inner { grid-template-columns: 1fr; }
+  .about-mission__grid { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: 1fr 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .footer__top { grid-template-columns: 1fr 1fr; }
+  .nav__links { display: none; }
+}
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: 1fr; }
+  .hero__stats { grid-template-columns: 1fr; gap: 16px; }
+  .footer__top { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .container { padding: 0 20px; }
+  .contact-form { padding: 28px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<nav class="nav" id="mainNav">
+  <div class="container">
+    <div class="nav__inner">
+      <div class="nav__logo" onclick="navigate('home')">
+        <div class="nav__logo-icon">💊</div>
+        <span class="nav__logo-text">Pharm<span>AI</span></span>
+      </div>
+      <ul class="nav__links">
+        <li><button onclick="navigate('home')" id="nav-home">Home</button></li>
+        <li><button onclick="navigate('how')" id="nav-how">How It Works</button></li>
+        <li><button onclick="navigate('plans')" id="nav-plans">Plans</button></li>
+        <li><button onclick="navigate('about')" id="nav-about">About Us</button></li>
+        <li><button onclick="navigate('contact')" id="nav-contact" class="nav__cta">Contact</button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     PAGE: HOME
+============================================================ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__bg">
+      <div class="hero__bg-circle hero__bg-circle--1"></div>
+      <div class="hero__bg-circle hero__bg-circle--2"></div>
+      <div class="hero__grid-pattern"></div>
+    </div>
+    <div class="container">
+      <div class="hero__inner">
+        <!-- LEFT: copy -->
+        <div class="hero__content">
+          <div class="hero__eyebrow">
+            <span class="hero__eyebrow-badge">GenAI-Powered · Made for Portugal</span>
+          </div>
+          <h1>Your pharmacy,<br/><em>automated.</em><br/>Your patients, <strong>protected.</strong></h1>
+          <p class="hero__sub">
+            PharmAI is the all-in-one management tool for small Portuguese pharmacies — stock control, expiry tracking, patient records and financial insights, all powered by artificial intelligence.
+          </p>
+          <div class="hero__actions">
+            <button class="btn btn--primary" onclick="navigate('plans')">
+              Start Free Trial →
+            </button>
+            <button class="btn btn--ghost" onclick="navigate('how')">
+              See How It Works
+            </button>
+          </div>
+          <div class="hero__stats">
+            <div class="hero__stat">
+              <div class="hero__stat-num">36<span>%</span></div>
+              <div class="hero__stat-label">Managers lack time for stock control</div>
+            </div>
+            <div class="hero__stat" style="padding-left:20px">
+              <div class="hero__stat-num">50<span>%</span></div>
+              <div class="hero__stat-label">Patients misuse prescribed medication</div>
+            </div>
+            <div class="hero__stat" style="padding-left:20px">
+              <div class="hero__stat-num">1<span></span></div>
+              <div class="hero__stat-label">Single tool for complete management</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: AI CHATBOT -->
+        <div class="hero__chat-wrapper">
+          <div class="hero__chat-glow"></div>
+          <div class="chat-card">
+            <div class="chat-card__header">
+              <div class="chat-card__avatar">🤖</div>
+              <div class="chat-card__info">
+                <h3>PharmAI Assistant</h3>
+                <p>Online · Powered by AI</p>
+              </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-bubble chat-bubble--ai">
+                <div class="chat-bubble__icon">💊</div>
+                <div class="chat-bubble__msg">
+                  Hello! I'm the PharmAI assistant. How can we help your pharmacy today?
+                </div>
+              </div>
+            </div>
+
+            <div id="chatTyping" class="chat-typing" style="display:none; margin-bottom:12px;">
+              <div class="chat-typing__dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span>PharmAI is thinking…</span>
+            </div>
+
+            <div class="chat-input-area">
+              <input 
+                type="text" 
+                id="chatInput" 
+                placeholder="Ask about stock, patients, pricing…" 
+                onkeydown="if(event.key==='Enter') sendChat()"
+              />
+              <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">➤</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES OVERVIEW -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag">Platform Features</span>
+        <h2>Everything your pharmacy<br/>needs in one place</h2>
+        <p>From expiry date alerts to AI-generated financial reports — PharmAI eliminates manual tasks and gives you back time.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-card__icon">📦</div>
+          <h3>Smart Inventory Control</h3>
+          <p>Real-time stock tracking with AI-powered alerts before stockouts happen. Automated reorder suggestions based on demand patterns.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon">⏰</div>
+          <h3>Expiry Date Management</h3>
+          <p>Automatic scanning of expiration dates across all product lines. Receive alerts weeks before products expire, avoiding waste and compliance risks.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon">🧑‍⚕️</div>
+          <h3>Patient Record Hub</h3>
+          <p>Centralised digital records for each patient. Monitor medication adherence and flag patients at risk of misuse or non-compliance.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon">📊</div>
+          <h3>AI Financial Reports</h3>
+          <p>Automatically generate P&L summaries, revenue forecasts, and cost analysis — no accountant required. Updated in real time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon">🔮</div>
+          <h3>Demand Prediction</h3>
+          <p>Machine learning models trained on your pharmacy's sales history to accurately forecast which medications you will need next week, month, or season.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon">⚡</div>
+          <h3>Instant Automation</h3>
+          <p>Connect with your existing POS system and prescription database. PharmAI processes data automatically — zero manual data entry.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAND -->
+  <div class="stats-band">
+    <div class="container">
+      <div class="stats-band__grid">
+        <div class="stats-band__item">
+          <div class="stats-band__num">98<em>%</em></div>
+          <div class="stats-band__label">Stockout Reduction</div>
+        </div>
+        <div class="stats-band__item">
+          <div class="stats-band__num">3<em>h</em></div>
+          <div class="stats-band__label">Saved per manager per day</div>
+        </div>
+        <div class="stats-band__item">
+          <div class="stats-band__num">200<em>+</em></div>
+          <div class="stats-band__label">Portuguese pharmacies onboarded</div>
+        </div>
+        <div class="stats-band__item">
+          <div class="stats-band__num">4.9<em>★</em></div>
+          <div class="stats-band__label">Average customer satisfaction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS (preview) -->
+  <section class="section section--cream">
+    <div class="container--narrow">
+      <div class="section-header">
+        <span class="tag">How It Works</span>
+        <h2>Up and running<br/>in 3 simple steps</h2>
+        <p>No IT team required. Most pharmacies are fully operational within one afternoon.</p>
+      </div>
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-item__number">01</div>
+          <div class="step-item__content">
+            <h3>Connect your systems</h3>
+            <p>PharmAI integrates seamlessly with your existing POS, prescription database and medication management tools. The setup wizard handles the configuration automatically in under 30 minutes.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-item__number">02</div>
+          <div class="step-item__content">
+            <h3>AI analyses your data</h3>
+            <p>Our AI engine processes your historical records, stock movements and patient information to build a complete picture of your pharmacy — and to start identifying risks and opportunities immediately.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-item__number">03</div>
+          <div class="step-item__content">
+            <h3>Manage with a single dashboard</h3>
+            <p>From one clean interface you control inventory, review patient records, read AI-generated financial reports and receive proactive alerts — no more spreadsheets, no more guesswork.</p>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:48px">
+        <button class="btn btn--primary" onclick="navigate('how')">Explore All Features →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section section--dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag" style="background:rgba(0,137,123,0.25);color:#4DD0C4">Customer Stories</span>
+        <h2>Pharmacies like yours are already automating their businesses</h2>
+        <p>"See how pharmacies like yours are already automating their businesses with ease"</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <p class="testimonial-card__quote">Before PharmAI we used to have expired products on the shelf every month. That problem simply vanished. The expiry alerts alone paid for the subscription in the first week.</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar">AM</div>
+            <div class="testimonial-card__meta">
+              <strong>Ana Martins</strong>
+              <span>Pharmacy Manager · Farmácia Central, Lisboa</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-card__quote">The financial reports used to take my assistant two full days every month. Now PharmAI generates them automatically. I can finally focus on my patients, not on spreadsheets.</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar">RC</div>
+            <div class="testimonial-card__meta">
+              <strong>Rui Cardoso</strong>
+              <span>CEO · Farmácia Saúde, Porto</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-card__quote">I can now see which patients haven't refilled their prescriptions in time and reach out proactively. It's transforming the way we care for our community.</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar">IS</div>
+            <div class="testimonial-card__meta">
+              <strong>Inês Santos</strong>
+              <span>Pharmacist · Farmácia Nova, Setúbal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Start transforming your pharmacy today</h2>
+      <p>A smarter, automated management solution tailored to the needs of Portuguese pharmacies.</p>
+      <button class="btn btn--ghost" onclick="navigate('plans')" style="font-size:16px; padding: 16px 36px;">
+        View Plans & Pricing →
+      </button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <div class="footer__logo" onclick="navigate('home')">
+            <div class="footer__logo-icon">💊</div>
+            <span class="footer__logo-text">Pharm<span>AI</span></span>
+          </div>
+          <p class="footer__tagline">Grow your business by strengthening your patients and your company's management with the help of a pharmacy automation tool powered by AI technology.</p>
+        </div>
+        <div class="footer__col">
+          <h4>Product</h4>
+          <ul class="footer__links">
+            <li><button onclick="navigate('how')">How It Works</button></li>
+            <li><button onclick="navigate('plans')">Pricing</button></li>
+            <li><button onclick="navigate('home')">Features</button></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Company</h4>
+          <ul class="footer__links">
+            <li><button onclick="navigate('about')">About Us</button></li>
+            <li><button onclick="navigate('contact')">Contact</button></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Legal</h4>
+          <ul class="footer__links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">GDPR</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p class="footer__copy">© 2025 PharmAI. All rights reserved. Made in Portugal 🇵🇹</p>
+        <div class="footer__legal">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div><!-- /page-home -->
+
+
+<!-- ============================================================
+     PAGE: HOW IT WORKS
+============================================================ -->
+<div class="page" id="page-how">
+  <div class="hiw-hero">
+    <div class="container">
+      <span class="tag" style="margin-bottom:20px; display:inline-block">Platform Deep-Dive</span>
+      <h1>One tool.<br/><em>Every need covered.</em></h1>
+      <p style="margin-top:14px">Discover how PharmAI's four core modules work together to automate and elevate every corner of your pharmacy.</p>
+    </div>
+  </div>
+
+  <section class="features-deep">
+    <div class="container">
+
+      <!-- FEATURE 1: INVENTORY -->
+      <div class="feature-deep-item">
+        <div class="feature-deep-item__text">
+          <span class="tag">Module 01</span>
+          <h2>Intelligent Inventory & Stock Control</h2>
+          <p>Never face an empty shelf again. PharmAI continuously monitors your stock levels in real time and uses AI to predict when each product will run out — before it happens.</p>
+          <p>The system compares current stock against predicted demand and automatically flags items that need reordering, taking into account seasonality, local demand patterns and supplier lead times.</p>
+          <ul class="feature-deep-item__list">
+            <li>Real-time stock level monitoring across all product categories</li>
+            <li>AI-powered reorder suggestions based on demand history</li>
+            <li>Expiry date scanning with multi-week advance alerts</li>
+            <li>Batch lot tracking for regulatory compliance</li>
+            <li>Automated supplier ordering integration</li>
+          </ul>
+        </div>
+        <div class="feature-deep-item__visual">
+          <div class="feature-visual-inner">
+            <div class="mini-card">
+              <div class="mini-card__label">Stock Health Score</div>
+              <div class="mini-card__value">94<span style="font-size:1rem;color:var(--text-mid)">/100</span></div>
+              <div class="mini-card__sub">↑ 12 points this month</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-card__label">Low Stock Alerts</div>
+              <div style="margin-top:8px">
+                <div class="mini-bar-row">
+                  <span class="mini-bar-label">Paracetamol</span>
+                  <div class="mini-bar-track"><div class="mini-bar-fill" style="width:18%"></div></div>
+                  <span class="mini-bar-pct">18%</span>
+                </div>
+                <div class="mini-bar-row">
+                  <span class="mini-bar-label">Ibuprofen</span>
+                  <div class="mini-bar-track"><div class="mini-bar-fill" style="width:72%"></div></div>
+                  <span class="mini-bar-pct">72%</span>
+                </div>
+                <div class="mini-bar-row">
+                  <span class="mini-bar-label">Amoxicillin</span>
+                  <div class="mini-bar-track"><div class="mini-bar-fill" style="width:45%"></div></div>
+                  <span class="mini-bar-pct">45%</span>
+                </div>
+              </div>
+            </div>
+            <div class="mini-alert mini-alert--warn">
+              <span class="mini-alert--icon">⚠️</span>
+              Paracetamol 500mg · Reorder now · 3 days remaining
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURE 2: EXPIRY -->
+      <div class="feature-deep-item">
+        <div class="feature-deep-item__text">
+          <span class="tag">Module 02</span>
+          <h2>Expiry Date Management & Compliance</h2>
+          <p>Expired products on the shelf are a compliance risk, a revenue drain, and a safety hazard. PharmAI eliminates this problem entirely with automated expiry tracking built into your daily workflow.</p>
+          <p>Receive tiered alerts — 90, 60, 30 and 7 days before expiry — so you have time to discount, return or redistribute products rather than writing them off.</p>
+          <ul class="feature-deep-item__list">
+            <li>Tiered expiry alerts at 90, 60, 30 and 7 days</li>
+            <li>Automatic removal suggestions from active stock</li>
+            <li>Supplier return documentation generation</li>
+            <li>Monthly waste reduction reporting</li>
+            <li>INFARMED-compatible compliance audit trails</li>
+          </ul>
+        </div>
+        <div class="feature-deep-item__visual">
+          <div class="feature-visual-inner">
+            <div class="mini-card">
+              <div class="mini-card__label">Expiry Overview</div>
+              <div style="margin-top:10px; display:flex; gap:10px">
+                <div style="flex:1; text-align:center">
+                  <div style="font-size:1.6rem;font-weight:700;color:#d32f2f">3</div>
+                  <div style="font-size:10px;color:var(--text-soft)">Expired</div>
+                </div>
+                <div style="flex:1; text-align:center">
+                  <div style="font-size:1.6rem;font-weight:700;color:#F0A000">8</div>
+                  <div style="font-size:10px;color:var(--text-soft)">&lt;30 days</div>
+                </div>
+                <div style="flex:1; text-align:center">
+                  <div style="font-size:1.6rem;font-weight:700;color:var(--teal)">24</div>
+                  <div style="font-size:10px;color:var(--text-soft)">&lt;90 days</div>
+                </div>
+              </div>
+            </div>
+            <div class="mini-alert mini-alert--warn">
+              <span class="mini-alert--icon">🗓️</span>
+              Aspirin 100mg · Expires 15 Apr · 18 units
+            </div>
+            <div class="mini-alert mini-alert--ok">
+              <span class="mini-alert--icon">✅</span>
+              Vitamin D3 · Returned to supplier · Saved €42
+            </div>
+            <div class="mini-card">
+              <div class="mini-card__label">Waste Saved This Year</div>
+              <div class="mini-card__value">€1,240</div>
+              <div class="mini-card__sub">vs €4,890 same period last year</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURE 3: PATIENT -->
+      <div class="feature-deep-item">
+        <div class="feature-deep-item__text">
+          <span class="tag">Module 03</span>
+          <h2>Patient Record Management</h2>
+          <p>Up to 50% of patients misuse prescribed medication. PharmAI helps you build a real relationship with every patient — tracking their medication history, flagging adherence issues, and empowering your pharmacists to intervene at the right moment.</p>
+          <p>Every patient interaction is automatically logged and analysed, building a longitudinal health profile that makes personalised care possible without extra manual work.</p>
+          <ul class="feature-deep-item__list">
+            <li>Centralised digital profiles for every patient</li>
+            <li>Medication adherence tracking and alerts</li>
+            <li>Interaction and contraindication warnings</li>
+            <li>Chronic condition monitoring dashboards</li>
+            <li>GDPR-compliant data storage and access control</li>
+          </ul>
+        </div>
+        <div class="feature-deep-item__visual">
+          <div class="feature-visual-inner">
+            <div class="mini-card">
+              <div class="mini-card__label">Patient Monitoring</div>
+              <div style="margin-top:10px">
+                <div class="mini-patient-row">
+                  <div class="mini-patient-avatar">MS</div>
+                  <div class="mini-patient-info">
+                    <div class="mini-patient-name">Maria Silva</div>
+                    <div class="mini-patient-med">Metformin 500mg · Last fill 22 days ago</div>
+                  </div>
+                  <span class="mini-patient-badge mini-patient-badge--warn">Overdue</span>
+                </div>
+                <div class="mini-patient-row">
+                  <div class="mini-patient-avatar">JP</div>
+                  <div class="mini-patient-info">
+                    <div class="mini-patient-name">João Pereira</div>
+                    <div class="mini-patient-med">Lisinopril 10mg · Refilled on time</div>
+                  </div>
+                  <span class="mini-patient-badge mini-patient-badge--ok">On track</span>
+                </div>
+                <div class="mini-patient-row">
+                  <div class="mini-patient-avatar">AF</div>
+                  <div class="mini-patient-info">
+                    <div class="mini-patient-name">Ana Ferreira</div>
+                    <div class="mini-patient-med">Atorvastatin 20mg · 3 days remaining</div>
+                  </div>
+                  <span class="mini-patient-badge mini-patient-badge--ok">Active</span>
+                </div>
+              </div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-card__label">Adherence Rate</div>
+              <div class="mini-card__value">82<span style="font-size:1rem">%</span></div>
+              <div class="mini-card__sub">↑ 19% since using PharmAI</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURE 4: FINANCIAL -->
+      <div class="feature-deep-item">
+        <div class="feature-deep-item__text">
+          <span class="tag">Module 04</span>
+          <h2>AI-Powered Financial Analytics</h2>
+          <p>PharmAI automatically processes every sale, return and purchase to generate clear, actionable financial intelligence — from daily cash flow to quarterly P&L reports — without you lifting a finger.</p>
+          <p>Our AI learns your pharmacy's patterns and delivers forward-looking forecasts, helping you make smarter purchasing decisions and understand the true health of your business.</p>
+          <ul class="feature-deep-item__list">
+            <li>Automated daily, weekly and monthly revenue reports</li>
+            <li>Margin analysis by product category</li>
+            <li>AI-generated revenue forecasts with confidence ranges</li>
+            <li>Cost-per-prescription and profitability metrics</li>
+            <li>Export-ready reports for accountants and tax filings</li>
+          </ul>
+        </div>
+        <div class="feature-deep-item__visual">
+          <div class="feature-visual-inner">
+            <div class="mini-card">
+              <div class="mini-card__label">Monthly Revenue</div>
+              <div class="mini-card__value">€38,420</div>
+              <div class="mini-card__sub">↑ 14.2% vs last month</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-card__label">Revenue Trend (6 months)</div>
+              <div class="mini-chart-row" style="margin-top:10px">
+                <div class="mini-bar-chart" style="height:45%"></div>
+                <div class="mini-bar-chart" style="height:55%"></div>
+                <div class="mini-bar-chart" style="height:62%"></div>
+                <div class="mini-bar-chart" style="height:70%"></div>
+                <div class="mini-bar-chart" style="height:80%"></div>
+                <div class="mini-bar-chart" style="height:100%; background:var(--teal)"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:4px">
+                <span style="font-size:9px;color:var(--text-soft)">Oct</span>
+                <span style="font-size:9px;color:var(--text-soft)">Nov</span>
+                <span style="font-size:9px;color:var(--text-soft)">Dec</span>
+                <span style="font-size:9px;color:var(--text-soft)">Jan</span>
+                <span style="font-size:9px;color:var(--text-soft)">Feb</span>
+                <span style="font-size:9px;color:var(--teal);font-weight:600">Mar</span>
+              </div>
+            </div>
+            <div class="mini-tag-row">
+              <span class="mini-tag">Top: Generic Drugs</span>
+              <span class="mini-tag">+Vitamins</span>
+              <span class="mini-tag">+Dermatology</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to automate your pharmacy?</h2>
+      <p>Low stocks and expired dates no more. Join 200+ Portuguese pharmacies already using PharmAI.</p>
+      <button class="btn btn--ghost" onclick="navigate('plans')">Choose Your Plan →</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <div class="footer__logo" onclick="navigate('home')">
+            <div class="footer__logo-icon">💊</div>
+            <span class="footer__logo-text">Pharm<span>AI</span></span>
+          </div>
+          <p class="footer__tagline">Automate your pharmacy's management and reduce your lack of, or expired stock.</p>
+        </div>
+        <div class="footer__col"><h4>Product</h4><ul class="footer__links"><li><button onclick="navigate('how')">How It Works</button></li><li><button onclick="navigate('plans')">Pricing</button></li></ul></div>
+        <div class="footer__col"><h4>Company</h4><ul class="footer__links"><li><button onclick="navigate('about')">About Us</button></li><li><button onclick="navigate('contact')">Contact</button></li></ul></div>
+        <div class="footer__col"><h4>Legal</h4><ul class="footer__links"><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li><li><a href="#">GDPR</a></li></ul></div>
+      </div>
+      <div class="footer__bottom">
+        <p class="footer__copy">© 2025 PharmAI. All rights reserved. Made in Portugal 🇵🇹</p>
+        <div class="footer__legal"><a href="#">Privacy</a><a href="#">Terms</a></div>
+      </div>
+    </div>
+  </footer>
+</div><!-- /page-how -->
+
+
+<!-- ============================================================
+     PAGE: PLANS
+============================================================ -->
+<div class="page" id="page-plans">
+  <div class="plans-hero">
+    <div class="container" style="position:relative">
+      <span class="tag" style="margin-bottom:20px;display:inline-block;background:rgba(0,137,123,0.25);color:#4DD0C4">Transparent Pricing</span>
+      <h1>Plans built for<br/><em>every pharmacy</em></h1>
+      <p>No hidden fees. Cancel any time. Choose the plan that fits your pharmacy's size and ambition.</p>
+      <div class="billing-toggle" id="billingToggle">
+        <span class="active" id="toggleMonthly" onclick="setBilling('monthly')">Monthly</span>
+        <span id="toggleAnnual" onclick="setBilling('annual')">Annual <span class="billing-badge">Save 20%</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--mint-soft); padding-bottom: 0">
+    <div class="container">
+      <div class="plans-grid">
+
+        <!-- STARTER -->
+        <div class="plan-card">
+          <div class="plan-card__name">Starter</div>
+          <h3>Essential management for independent pharmacies.</h3>
+          <p class="plan-card__tagline">Perfect for a single-location pharmacy taking its first step into automated management.</p>
+          <div class="plan-price">
+            <div class="plan-price__amount"><sup>€</sup><span class="price-val" data-monthly="49" data-annual="39">49</span></div>
+            <div class="plan-price__period">per month <span id="starter-save" style="display:none" class="plan-price__period em">Save €120/yr</span></div>
+          </div>
+          <ul class="plan-features">
+            <li>Inventory & stock alerts</li>
+            <li>Expiry date tracking (basic)</li>
+            <li>Up to 500 patient records</li>
+            <li>Monthly financial summary</li>
+            <li>1 user account</li>
+            <li>Email support</li>
+            <li class="disabled">AI demand forecasting</li>
+            <li class="disabled">Advanced analytics</li>
+            <li class="disabled">Multi-location support</li>
+          </ul>
+          <button class="btn btn--secondary" onclick="navigate('contact')">Get Started</button>
+        </div>
+
+        <!-- PRO (FEATURED) -->
+        <div class="plan-card plan-card--featured">
+          <div class="plan-card__badge">Most Popular</div>
+          <div class="plan-card__name">Professional</div>
+          <h3>Full automation for the ambitious pharmacy manager.</h3>
+          <p class="plan-card__tagline">The complete PharmAI experience. Everything you need to run your pharmacy on autopilot.</p>
+          <div class="plan-price">
+            <div class="plan-price__amount"><sup>€</sup><span class="price-val" data-monthly="129" data-annual="103">129</span></div>
+            <div class="plan-price__period">per month <span id="pro-save" style="display:none" class="plan-price__period em">Save €312/yr</span></div>
+          </div>
+          <ul class="plan-features">
+            <li>Everything in Starter</li>
+            <li>AI demand forecasting</li>
+            <li>Unlimited patient records</li>
+            <li>Real-time financial analytics</li>
+            <li>Automated financial reports</li>
+            <li>5 user accounts</li>
+            <li>Priority email & chat support</li>
+            <li>INFARMED compliance reports</li>
+            <li class="disabled">Multi-location support</li>
+          </ul>
+          <button class="btn btn--primary" onclick="navigate('contact')">Start Free Trial →</button>
+        </div>
+
+        <!-- ENTERPRISE -->
+        <div class="plan-card">
+          <div class="plan-card__name">Enterprise</div>
+          <h3>For pharmacy groups and multi-location operations.</h3>
+          <p class="plan-card__tagline">Centralised management across all your locations with dedicated account support.</p>
+          <div class="plan-price">
+            <div class="plan-price__amount" style="font-size:2rem; padding-top:8px">Custom</div>
+            <div class="plan-price__period">Contact us for a quote</div>
+          </div>
+          <ul class="plan-features">
+            <li>Everything in Professional</li>
+            <li>Unlimited locations</li>
+            <li>Unlimited user accounts</li>
+            <li>Cross-location analytics</li>
+            <li>Custom integrations</li>
+            <li>Dedicated account manager</li>
+            <li>SLA guarantee (99.9% uptime)</li>
+            <li>On-site onboarding & training</li>
+            <li>Custom contract & billing</li>
+          </ul>
+          <button class="btn btn--secondary" onclick="navigate('contact')">Contact Sales</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="plans-comparison">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag">Full Comparison</span>
+        <h2>What's included in each plan</h2>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Starter</th>
+            <th>Professional</th>
+            <th>Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Stock level monitoring</td><td><span class="check-icon">✓</span></td><td><span class="check-icon">✓</span></td><td><span class="check-icon">✓</span></td></tr>
+          <tr><td>Expiry date alerts</td><td>Basic</td><td>Advanced (90/60/30/7d)</td><td>Advanced + Custom</td></tr>
+          <tr><td>Patient records</td><td>Up to 500</td><td>Unlimited</td><td>Unlimited</td></tr>
+          <tr><td>AI demand forecasting</td><td><span class="dash-icon">—</span></td><td><span class="check-icon">✓</span></td><td><span class="check-icon">✓</span></td></tr>
+          <tr><td>Financial reports</td><td>Monthly</td><td>Real-time</td><td>Real-time + Custom</td></tr>
+          <tr><td>User accounts</td><td>1</td><td>5</td><td>Unlimited</td></tr>
+          <tr><td>Locations</td><td>1</td><td>1</td><td>Unlimited</td></tr>
+          <tr><td>INFARMED compliance export</td><td><span class="dash-icon">—</span></td><td><span class="check-icon">✓</span></td><td><span class="check-icon">✓</span></td></tr>
+          <tr><td>API access</td><td><span class="dash-icon">—</span></td><td><span class="dash-icon">—</span></td><td><span class="check-icon">✓</span></td></tr>
+          <tr><td>Dedicated account manager</td><td><span class="dash-icon">—</span></td><td><span class="dash-icon">—</span></td><td><span class="check-icon">✓</span></td></tr>
+          <tr><td>Support</td><td>Email</td><td>Priority email & chat</td><td>24/7 phone & email</td></tr>
+          <tr><td>Free trial</td><td>14 days</td><td>14 days</td><td>Custom POC</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FAQ mini -->
+  <section class="section section--cream">
+    <div class="container--narrow">
+      <div class="section-header">
+        <span class="tag">FAQ</span>
+        <h2>Common questions</h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:24px 28px">
+          <strong style="font-size:15px;color:var(--navy);display:block;margin-bottom:8px">Can I cancel at any time?</strong>
+          <p style="font-size:14px;color:var(--text-mid);font-weight:300;line-height:1.65">Yes. PharmAI is a month-to-month subscription and you can cancel at any time. Annual plans are refundable on a pro-rata basis for unused months.</p>
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:24px 28px">
+          <strong style="font-size:15px;color:var(--navy);display:block;margin-bottom:8px">How long does the setup take?</strong>
+          <p style="font-size:14px;color:var(--text-mid);font-weight:300;line-height:1.65">Most pharmacies are fully set up within one afternoon. Our onboarding wizard guides you through connecting your POS, importing existing records and configuring your preferences.</p>
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:24px 28px">
+          <strong style="font-size:15px;color:var(--navy);display:block;margin-bottom:8px">Is my patient data safe?</strong>
+          <p style="font-size:14px;color:var(--text-mid);font-weight:300;line-height:1.65">All patient data is encrypted at rest and in transit, hosted on EU servers and fully GDPR-compliant. You own your data at all times and can export or delete it whenever you wish.</p>
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:24px 28px">
+          <strong style="font-size:15px;color:var(--navy);display:block;margin-bottom:8px">Do you offer a free trial?</strong>
+          <p style="font-size:14px;color:var(--text-mid);font-weight:300;line-height:1.65">Yes — every plan comes with a 14-day free trial. No credit card required. Enterprise customers can request a custom proof-of-concept period.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container">
+      <h2>Not sure which plan is right for you?</h2>
+      <p>Talk to our team and we'll recommend the best fit for your pharmacy's size and goals.</p>
+      <button class="btn btn--ghost" onclick="navigate('contact')">Talk to Sales →</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <div class="footer__logo" onclick="navigate('home')"><div class="footer__logo-icon">💊</div><span class="footer__logo-text">Pharm<span>AI</span></span></div>
+          <p class="footer__tagline">Automate your pharmacy's management and reduce your lack of, or expired stock.</p>
+        </div>
+        <div class="footer__col"><h4>Product</h4><ul class="footer__links"><li><button onclick="navigate('how')">How It Works</button></li><li><button onclick="navigate('plans')">Pricing</button></li></ul></div>
+        <div class="footer__col"><h4>Company</h4><ul class="footer__links"><li><button onclick="navigate('about')">About Us</button></li><li><button onclick="navigate('contact')">Contact</button></li></ul></div>
+        <div class="footer__col"><h4>Legal</h4><ul class="footer__links"><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li><li><a href="#">GDPR</a></li></ul></div>
+      </div>
+      <div class="footer__bottom">
+        <p class="footer__copy">© 2025 PharmAI. All rights reserved.</p>
+        <div class="footer__legal"><a href="#">Privacy</a><a href="#">Terms</a></div>
+      </div>
+    </div>
+  </footer>
+</div><!-- /page-plans -->
+
+
+<!-- ============================================================
+     PAGE: ABOUT
+============================================================ -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <div class="container">
+      <div class="about-hero__inner">
+        <div>
+          <span class="tag" style="margin-bottom:20px;display:inline-block">Our Story</span>
+          <h1>Built by people<br/>who understand<br/><em>pharmacy pain.</em></h1>
+          <p style="margin-top:16px">PharmAI was born from a simple frustration: the tools available to Portugal's 2,900 independent pharmacies were outdated, disconnected and demanded too much manual effort. We set out to change that.</p>
+        </div>
+        <div class="about-hero__visual">
+          <div style="text-align:center;padding:20px">
+            <div style="font-size:4rem;margin-bottom:14px">🏥</div>
+            <h3 style="font-family:var(--font-serif);font-size:1.6rem;font-weight:300;color:white;margin-bottom:12px">Our mission</h3>
+            <p style="font-size:15px;color:rgba(255,255,255,0.6);font-weight:300;line-height:1.7">"Grow your business by strengthening your patients and your company's management with the help of a pharmacy automation tool powered by AI technology."</p>
+            <div style="margin-top:24px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1)">
+              <div style="display:flex;justify-content:space-around">
+                <div style="text-align:center">
+                  <div style="font-family:var(--font-serif);font-size:2rem;font-weight:300;color:white">2022</div>
+                  <div style="font-size:11px;color:rgba(255,255,255,0.4)">Founded</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-family:var(--font-serif);font-size:2rem;font-weight:300;color:white">200<span style="color:#4DD0C4">+</span></div>
+                  <div style="font-size:11px;color:rgba(255,255,255,0.4)">Pharmacies</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-family:var(--font-serif);font-size:2rem;font-weight:300;color:white">🇵🇹</div>
+                  <div style="font-size:11px;color:rgba(255,255,255,0.4)">Portugal-first</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="about-mission">
+    <div class="container">
+      <div class="about-mission__grid">
+        <div>
+          <span class="tag" style="margin-bottom:14px;display:inline-block">The Problem We Solve</span>
+          <h2>Portuguese pharmacies have been underserved for too long</h2>
+          <p>Research from Universidade Lusófona revealed that 36% of pharmacy managers know they need better stock management but simply lack the time to do it properly. Meanwhile, the Ordem dos Farmacêuticos estimates that up to 50% of patients misuse prescribed medication.</p>
+          <p>These aren't just numbers. They represent lost revenue, wasted medication, and patients at risk. PharmAI was built to close this gap — making enterprise-grade pharmacy management accessible to every independent pharmacy in Portugal.</p>
+          <p>Our AI doesn't just report what happened. It tells you what's about to happen, and what you should do about it.</p>
+        </div>
+        <div>
+          <span class="tag" style="margin-bottom:14px;display:inline-block">Our Values</span>
+          <h2>What drives us every day</h2>
+          <div class="about-values">
+            <div class="value-card">
+              <div class="value-card__icon">🎯</div>
+              <h4>Precision</h4>
+              <p>Every alert, report and prediction we generate must be actionable and trustworthy.</p>
+            </div>
+            <div class="value-card">
+              <div class="value-card__icon">❤️</div>
+              <h4>Patient First</h4>
+              <p>The end goal of every feature we build is a healthier patient community.</p>
+            </div>
+            <div class="value-card">
+              <div class="value-card__icon">🇵🇹</div>
+              <h4>Local Roots</h4>
+              <p>Built in Portugal, for Portugal. We understand local regulations and market realities.</p>
+            </div>
+            <div class="value-card">
+              <div class="value-card__icon">🔒</div>
+              <h4>Privacy</h4>
+              <p>Patient data is sacred. We are GDPR-compliant by design, not by checkbox.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag">The Team</span>
+        <h2>Pharmacists, engineers<br/>and data scientists</h2>
+        <p>Our team combines deep pharmaceutical expertise with AI and product experience to build tools that truly fit the workflow of a real pharmacy.</p>
+      </div>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-card__avatar" style="background:linear-gradient(135deg,var(--teal),#006064)">AQ</div>
+          <h3>António Quinta</h3>
+          <p class="team-card__role">Co-Founder & CEO</p>
+          <p>Pharmacist with 15 years of independent pharmacy experience in the Lisbon area. Frustrated by legacy tools, he co-founded PharmAI to give pharmacists back their time.</p>
+        </div>
+        <div class="team-card">
+          <div class="team-card__avatar" style="background:linear-gradient(135deg,#00695C,var(--gold))">AS</div>
+          <h3>António Sàágua</h3>
+          <p class="team-card__role">Co-Founder & CTO</p>
+          <p>ML engineer and former healthcare data scientist. Built the AI core that powers PharmAI's demand forecasting and expiry tracking engines.</p>
+        </div>
+        <div class="team-card">
+          <div class="team-card__avatar" style="background:linear-gradient(135deg,var(--gold),#C05000)">JS</div>
+          <h3>José Seara</h3>
+          <p class="team-card__role">Co-Founder & CMO</p>
+          <p>Marketing strategist specialised in B2B healthcare. Leads PharmAI's go-to-market strategy, customer success and brand development across Portugal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container">
+      <h2>Join the PharmAI movement</h2>
+      <p>Promote a healthier community of patients by tracking their health and your finances.</p>
+      <button class="btn btn--ghost" onclick="navigate('contact')">Get in Touch →</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand"><div class="footer__logo" onclick="navigate('home')"><div class="footer__logo-icon">💊</div><span class="footer__logo-text">Pharm<span>AI</span></span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div>
+        <div class="footer__col"><h4>Product</h4><ul class="footer__links"><li><button onclick="navigate('how')">How It Works</button></li><li><button onclick="navigate('plans')">Pricing</button></li></ul></div>
+        <div class="footer__col"><h4>Company</h4><ul class="footer__links"><li><button onclick="navigate('about')">About Us</button></li><li><button onclick="navigate('contact')">Contact</button></li></ul></div>
+        <div class="footer__col"><h4>Legal</h4><ul class="footer__links"><li><a href="#">Privacy</a></li><li><a href="#">GDPR</a></li></ul></div>
+      </div>
+      <div class="footer__bottom"><p class="footer__copy">© 2025 PharmAI. Made in Portugal 🇵🇹</p></div>
+    </div>
+  </footer>
+</div><!-- /page-about -->
+
+
+<!-- ============================================================
+     PAGE: CONTACT
+============================================================ -->
+<div class="page" id="page-contact">
+  <div class="contact-hero">
+    <div class="container" style="position:relative">
+      <span class="tag" style="margin-bottom:20px;display:inline-block;background:rgba(0,137,123,0.2);color:#4DD0C4">Get In Touch</span>
+      <h1>Let's talk about<br/>your pharmacy</h1>
+      <p>We'd love to understand your needs and show you exactly how PharmAI can help.</p>
+    </div>
+  </div>
+
+  <section class="contact-section">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h2>We're here to help your pharmacy thrive</h2>
+          <p>Whether you're a single pharmacy manager curious about automation, or a group looking for an enterprise solution — our team will find the right fit for you.</p>
+          <div class="contact-details">
+            <div class="contact-detail">
+              <div class="contact-detail__icon">📍</div>
+              <div>
+                <strong>Office</strong>
+                <span>Avenida da Liberdade, 110, Lisboa, Portugal</span>
+              </div>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail__icon">✉️</div>
+              <div>
+                <strong>Email</strong>
+                <span>hello@pharmai.pt</span>
+              </div>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail__icon">📞</div>
+              <div>
+                <strong>Phone</strong>
+                <span>+351 210 000 000</span>
+              </div>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail__icon">🕐</div>
+              <div>
+                <strong>Hours</strong>
+                <span>Monday – Friday, 9:00 – 18:00 WET</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form" id="contactFormWrapper">
+          <div id="contactFormContent">
+            <h3 style="font-family:var(--font-serif);font-weight:300;font-size:1.5rem;color:var(--navy);margin-bottom:6px">Send us a message</h3>
+            <p style="font-size:14px;color:var(--text-mid);font-weight:300;margin-bottom:28px">We typically respond within one business day.</p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" id="f-fname" placeholder="Ana"/>
+              </div>
+              <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" id="f-lname" placeholder="Martins"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" id="f-email" placeholder="ana@farmaciacentral.pt"/>
+            </div>
+            <div class="form-group">
+              <label>Pharmacy Name</label>
+              <input type="text" id="f-pharmacy" placeholder="Farmácia Central"/>
+            </div>
+            <div class="form-group">
+              <label>I'm interested in</label>
+              <select id="f-interest">
+                <option>Starter Plan</option>
+                <option>Professional Plan</option>
+                <option>Enterprise / Multi-location</option>
+                <option>General Information</option>
+                <option>Technical Support</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="f-msg" placeholder="Tell us about your pharmacy and what you're looking to achieve…"></textarea>
+            </div>
+            <button class="btn btn--primary form-submit" onclick="submitForm()">Send Message →</button>
+          </div>
+          <div class="form-success" id="formSuccess">
+            <div class="form-success__icon">✅</div>
+            <h3>Message received!</h3>
+            <p>Thank you for reaching out. A member of our team will be in touch within one business day.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand"><div class="footer__logo" onclick="navigate('home')"><div class="footer__logo-icon">💊</div><span class="footer__logo-text">Pharm<span>AI</span></span></div><p class="footer__tagline">Automate your pharmacy's management.</p></div>
+        <div class="footer__col"><h4>Product</h4><ul class="footer__links"><li><button onclick="navigate('how')">How It Works</button></li><li><button onclick="navigate('plans')">Pricing</button></li></ul></div>
+        <div class="footer__col"><h4>Company</h4><ul class="footer__links"><li><button onclick="navigate('about')">About Us</button></li><li><button onclick="navigate('contact')">Contact</button></li></ul></div>
+        <div class="footer__col"><h4>Legal</h4><ul class="footer__links"><li><a href="#">Privacy</a></li><li><a href="#">GDPR</a></li></ul></div>
+      </div>
+      <div class="footer__bottom"><p class="footer__copy">© 2025 PharmAI. Made in Portugal 🇵🇹</p></div>
+    </div>
+  </footer>
+</div><!-- /page-contact -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================
+   ROUTING
+================================================ */
+let currentPage = 'home';
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav__links button, .nav__links a').forEach(el => el.classList.remove('active'));
+  const navBtn = document.getElementById('nav-' + page);
+  if (navBtn) navBtn.classList.add('active');
+  currentPage = page;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ================================================
+   NAV SCROLL EFFECT
+================================================ */
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('mainNav');
+  if (window.scrollY > 40) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+});
+
+/* ================================================
+   BILLING TOGGLE
+================================================ */
+let billingMode = 'monthly';
+
+function setBilling(mode) {
+  billingMode = mode;
+  document.getElementById('toggleMonthly').classList.toggle('active', mode === 'monthly');
+  document.getElementById('toggleAnnual').classList.toggle('active', mode === 'annual');
+
+  document.querySelectorAll('.price-val').forEach(el => {
+    const val = el.dataset[mode];
+    el.textContent = val;
+  });
+
+  const saveEls = ['starter-save', 'pro-save'];
+  saveEls.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = mode === 'annual' ? 'inline' : 'none';
+  });
+}
+
+/* ================================================
+   CONTACT FORM
+================================================ */
+function submitForm() {
+  const fname = document.getElementById('f-fname').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  if (!fname || !email) {
+    showToast('Please fill in your name and email.');
+    return;
+  }
+  document.getElementById('contactFormContent').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+  showToast('Message sent successfully! ✅');
+}
+
+/* ================================================
+   TOAST
+================================================ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ================================================
+   CHATBOT — Anthropic API powered
+================================================ */
+const chatHistory = [];
+
+const SYSTEM_PROMPT = `You are the PharmAI Assistant embedded on the PharmAI website homepage.
+PharmAI is an AI-powered pharmacy management tool for small Portuguese pharmacies. It helps with:
+- Inventory & stock management
+- Expiry date tracking
+- Patient record management
+- AI-powered financial reports
+- Demand forecasting
+- Pharmacy automation
+
+The website has the following pages:
+- Home (general info, hero)
+- How It Works (features deep-dive: inventory, expiry, patients, financial analytics)
+- Plans (pricing: Starter €49/mo, Professional €129/mo, Enterprise custom)
+- About Us (team, mission, values)
+- Contact (form, sales enquiries)
+
+When a user asks something related to what PharmAI can help with, respond helpfully in 1-2 sentences and END your response with a JSON redirect like:
+{"redirect":"how"} or {"redirect":"plans"} or {"redirect":"about"} or {"redirect":"contact"} or {"redirect":"home"}
+
+When the question is about pricing, costs, or plans → redirect to plans.
+When about features, how it works, stock, expiry, patients, reports → redirect to how.
+When about the company, team, mission → redirect to about.
+When wanting a demo, to talk to someone, or sign up → redirect to contact.
+
+If the question is completely unrelated to pharmacy management or PharmAI, respond with something like: "I'm sorry, that's outside what we cover here at PharmAI. We specialise in pharmacy management tools — is there anything about managing your pharmacy we can help you with?" and NO redirect JSON.
+
+Keep responses short, warm and professional. Reply in the same language the user writes in (Portuguese or English).`;
+
+const PAGE_LABELS = {
+  home: 'Home',
+  how: 'How It Works',
+  plans: 'Plans & Pricing',
+  about: 'About Us',
+  contact: 'Contact Us'
+};
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('chatSendBtn');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  btn.disabled = true;
+
+  appendMessage('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  document.getElementById('chatTyping').style.display = 'flex';
+  scrollChat();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: SYSTEM_PROMPT,
+        messages: chatHistory
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || "I'm having trouble responding right now. Please try again.";
+
+    // Parse redirect
+    const jsonMatch = raw.match(/\{"redirect"\s*:\s*"(\w+)"\}/);
+    const redirectPage = jsonMatch ? jsonMatch[1] : null;
+    const cleanText = raw.replace(/\{"redirect"\s*:\s*"\w+"\}/, '').trim();
+
+    chatHistory.push({ role: 'assistant', content: raw });
+
+    document.getElementById('chatTyping').style.display = 'none';
+    appendMessage('ai', cleanText, redirectPage);
+  } catch (e) {
+    document.getElementById('chatTyping').style.display = 'none';
+    appendMessage('ai', "I'm having a little trouble right now. Please contact us directly for help.");
+  }
+
+  btn.disabled = false;
+  scrollChat();
+}
+
+function appendMessage(role, text, redirectPage) {
+  const container = document.getElementById('chatMessages');
+  const bubble = document.createElement('div');
+  bubble.className = `chat-bubble chat-bubble--${role}`;
+
+  const icon = document.createElement('div');
+  icon.className = 'chat-bubble__icon';
+  icon.textContent = role === 'ai' ? '💊' : '👤';
+
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'chat-bubble__msg';
+  msgDiv.textContent = text;
+
+  if (redirectPage && PAGE_LABELS[redirectPage]) {
+    const linkBtn = document.createElement('button');
+    linkBtn.className = 'chat-bubble__link';
+    linkBtn.innerHTML = `Go to ${PAGE_LABELS[redirectPage]} →`;
+    linkBtn.onclick = () => navigate(redirectPage);
+    msgDiv.appendChild(document.createElement('br'));
+    msgDiv.appendChild(linkBtn);
+  }
+
+  bubble.appendChild(icon);
+  bubble.appendChild(msgDiv);
+  container.appendChild(bubble);
+  scrollChat();
+}
+
+function scrollChat() {
+  const c = document.getElementById('chatMessages');
+  c.scrollTop = c.scrollHeight;
+}
+
+// Allow Enter key
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') sendChat();
+});
+
+// Set home active on load
+navigate('home');
+</script>
+</body>
+</html>
